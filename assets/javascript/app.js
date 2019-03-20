@@ -77,7 +77,7 @@ let categories = [
     length: 4,
     difficulty: 'Hard',
     description: 'A trivia category popularized by the long running TV show Jeopardy! and several appearances on the Saturday Night Live\'s skit Celebrity Jeopardy!' +
-    'This category features questions having to do with alcoholic beverages.',
+    ' This category features questions having to do with alcoholic beverages.',
     questions: [
       { 
         question: "More similar to beer than wine in production, this alcohol begins with steamed rice & mold.",
@@ -115,10 +115,8 @@ initHtml = () => {
         '<h1 class="display-3 text-center" id="title">Welcome to Trivia!</h1>' +
         '<h1 class="display-1 text-center" id="timer"></h1>' +
         '<hr class="my-4">' +
-        '<h2 class="text-center" id="subtitle">Press start to begin</h1>' +
-        //'<div class="row" id="main-content">' +
+        '<h2 id="subtitle">Press start to begin</h1>' +
           '<button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>' +
-          '<div class="tab"></div>' +
         '</div>' +  
       '</div>' +
     '</div>' );
@@ -134,7 +132,6 @@ subtitle = $( '#subtitle' );
 startButton = $( '#btn-start' );
 content = $( '#main-content' );
 timer = $( '#timer' );
-tab = $( '.tab' )
 
 // Start the game on click
 $( startButton ).on( 'click', function() {
@@ -144,8 +141,8 @@ $( startButton ).on( 'click', function() {
 
 
 selectCategoryHtml = () => {
-
-  console.log( 'Select a Category' );
+  content.append( '<div class="tab"></div>' )
+  tab = $( '.tab' )
   subtitle.text( 'Select a Category' );
   startButton.remove();
   categories.forEach( function( i ) {
@@ -153,18 +150,17 @@ selectCategoryHtml = () => {
     tab.append( 
      // '<div class="col-lg-4 text-center">' + 
         '<button type="button" class="btn btn-outline-success btn-lg btn-category tablinks" value=' + i.value +
-         ' onmouseover="openCategory(event, ' + i.tabId + ')">' +
+         ' onmouseover="openCategory(event, ' +"'"+ i.tabId +"'" + ')">' +
          i.name + 
         '</button>' + 
       '</div>' 
     );
     content.append(
       '<div id="' + i.tabId + '" class="tabcontent">' +
-      '<h4>' + i.name + '</h4>' +
-      '<hr class="my-4">' +
-      '<h5>Difficulty: ' + i.difficulty + '</h5>' + 
-      '<h5>Questions: ' + i.length + '</h5>' + 
-      '<h5>Description: ' + i.description + '</h5>'
+      '<h4><b><u>' + i.name + '</u></b></h4>' +
+      '<h5><b>Difficulty:</b> ' + i.difficulty + '</h5>' + 
+      '<h5><b>Questions:</b> ' + i.length + '</h5>' + 
+      '<h5><b>Description:</b> ' + i.description + '</h5>'
     )
   } );
     content.append( '<div class="cleafix"></div' );
