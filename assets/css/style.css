@@ -1,11 +1,29 @@
 body {
-  background: 
+  background: url(../images/bananas.png);
 }
 
-.vertical-center {
-  min-height: 100%;
-  min-height: 100vh;
 
-  display: flex;
-  align-items: center;
+.jumbotron {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 40%;
+  transform: translate(-50%, -50%);
+}
+
+#btn-start {
+  width: 20%;
+  margin: 4rem auto;
+}
+
+.btn-category {
+  margin-top: 4rem;
+}
+
+/*-- Countdown Timer --*/
+#countdown {
+  position: relative;
+  margin: auto;
+  text-align: center;
 }
