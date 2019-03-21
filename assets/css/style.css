@@ -61,3 +61,13 @@ body {
   display: none;
 }
 
+/*-- Answer Choices --*/
+.choice {
+  color: black;
+  background: none;
+}
+
+.choice:hover {
+  color: white;
+  background-color: #007bff;
+}

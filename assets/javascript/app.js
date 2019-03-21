@@ -108,7 +108,7 @@ let categories = [
 
 
 // Create initial page html
-initHtml = () => {
+generateInitialHtml = () => {
   $( 'body' ).append( 
     `<div class="container">
         <div class="jumbotron">
@@ -126,7 +126,7 @@ initHtml = () => {
 
 
 // Run first so we can select elements
-initHtml();
+generateInitialHtml();
 
 // Select elements from created html
 jumbotron = $( '.jumbotron' );
@@ -188,12 +188,12 @@ selectCategoryHtml = () => {
 
 startGame = ( cat ) => {
   questionCounter = 0;
+  questionCounterHtml.text( `Question ${questionCounter + 1}` ).hide();
   // Switch subtitle to category name and display question counter
   subtitle.fadeOut( 0, function() {
     subtitle.text( cat.name ).fadeIn( 200 );
-    console.log("question counter: " + questionCounter)
-    questionCounterHtml.text( `Question ${questionCounter}` )
-  } );
+    questionCounterHtml.fadeIn( 200 );
+      } );
   // Remove all select categories html
   removeCategories();
   // Randomize order of questions
@@ -212,28 +212,27 @@ displayQuestion = ( q ) => {
   console.log("question index: " + qIndex)
   questionText.text( q[qIndex].question );
   questionCounter++; // Increment question counter so a new question is displayed on every call
-  selectAnswerHtml( q );
+  generateAnswerHtml( q );
 }
 
 // Generates html to display each possible answer in a list
-selectAnswerHtml = ( a ) => {
+generateAnswerHtml = ( a ) => {
   // Randomize order of choices and store in array 
   let choiceOrder = shuffle( [...a[qIndex].choices] );
   // Create element to append our choices
   content.append( `<div class="list-group"></div>` );
   // Loop to create each choice element, every question has 4 choices so this will work on every question
   for ( let i = 0; i < 4; i++ ) {
+    let listNum = i + 1
     $( '.list-group' ).append(
-      `<button type="button" class="list-group-item list-group-item-action choice">${choiceOrder[i]}</button>`
+      `<button type="button" class="list-group-item list-group-item-action choice">${listNum}. ${choiceOrder[i]}</button>`
     );
   };
   choice = $( '.choice' )
 };
 
 // Get user click on choice
-choice.on( 'click', function() {
-  
-} );
+
 
 // Remove all select categories html
 removeCategories = () => {
@@ -241,8 +240,8 @@ removeCategories = () => {
   $( '.tabcontent' ).remove();
 }
 
-// Randomize the order of the questions so the questions appear in a different order on each game
-// Fisher-Yates  
+// Randomize the order of input array so questions/choices appear in a different order on each game
+// Fisher-Yates Shuffle
 shuffle = ( array ) => {
   var m = array.length, t, i;
 
