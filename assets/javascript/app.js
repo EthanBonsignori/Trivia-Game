@@ -2,7 +2,7 @@
 // select length of game (# of questions), sound effects, gifs 
 // Harder difficulty - less time to answer questions
 
-let title, subtitle, startButton, chosenCategory;
+let title, subtitle, startButton, content, chosenCategory, randQuestionOrder;
 
 let categories = [
 
@@ -105,17 +105,16 @@ let categories = [
 
 ];
 
-console.log(potentPotables.questions.length)
 
 // Create initial page html
 initHtml = () => {
   $( 'body' ).append( 
     '<div class="container">' +
-      '<div class="jumbotron" id="main-content">' +
+      '<div class="jumbotron">' +
         '<h1 class="display-3 text-center" id="title">Welcome to Trivia!</h1>' +
-        '<h1 class="display-1 text-center" id="timer"></h1>' +
         '<hr class="my-4">' +
         '<h2 id="subtitle">Press start to begin</h1>' +
+        '<div id="main-content">' +
           '<button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>' +
         '</div>' +  
       '</div>' +
@@ -126,44 +125,46 @@ initHtml = () => {
 // Run first so we can select elements
 initHtml();
 
-// Select elements
+// Select elements from created html
 title = $( '#title' );
 subtitle = $( '#subtitle' );
-startButton = $( '#btn-start' );
 content = $( '#main-content' );
-timer = $( '#timer' );
+startButton = $( '#btn-start' );
+jumbotron = $( '.jumbotron' );
 
-// Start the game on click
+// Start the game on start button click
 $( startButton ).on( 'click', function() {
-  console.log("Game started");
+  console.log( 'Game Started' )
   selectCategoryHtml();
 } );
 
-
+// Show categories
 selectCategoryHtml = () => {
-  content.append( '<div class="tab"></div>' )
-  tab = $( '.tab' )
-  subtitle.text( 'Select a Category' );
   startButton.remove();
+  subtitle.text( 'Select a Category' );
+  // Add a tab for our category buttons
+  jumbotron.append( '<div class="tab"></div>' )
+  let tab = $( '.tab' )
+  
+  // Loop for each category, adding a button for each then their tab content"
   categories.forEach( function( i ) {
-    console.log(i)
+    // Create button
     tab.append( 
-     // '<div class="col-lg-4 text-center">' + 
-        '<button type="button" class="btn btn-outline-success btn-lg btn-category tablinks" value=' + i.value +
+        '<button type="button" class="btn btn-outline-primary btn-lg btn-category tablinks" value=' + i.value +
          ' onmouseover="openCategory(event, ' +"'"+ i.tabId +"'" + ')">' +
          i.name + 
         '</button>' + 
       '</div>' 
     );
-    content.append(
+    // Create tab content
+    jumbotron.append(
       '<div id="' + i.tabId + '" class="tabcontent">' +
-      '<h4><b><u>' + i.name + '</u></b></h4>' +
+      '<h4><u><b>' + i.name + '</b></u></h4>' +
       '<h5><b>Difficulty:</b> ' + i.difficulty + '</h5>' + 
       '<h5><b>Questions:</b> ' + i.length + '</h5>' + 
       '<h5><b>Description:</b> ' + i.description + '</h5>'
     )
   } );
-    content.append( '<div class="cleafix"></div' );
 
   // Get player's chosen category
   $('.btn-category').on( 'click', function() {
@@ -179,13 +180,36 @@ selectCategoryHtml = () => {
 
 
 startGame = (cat) => {
- title.text( cat.name );
- subtitle.text( cat.questions[1].question );
- content.empty();
+  title.text( cat.name );
+  randQuestionOrder = shuffle( [...cat.questions] );
+  testing(randQuestionOrder);
+}
+
+// Randomize the order of the questions so the questions appear in a different order on each game
+// Fisher-Yates Shuffle  
+shuffle = (array) => {
+  var m = array.length, t, i;
+
+  // While there remain elements to shuffle…
+  while (m) {
+
+    // Pick a remaining element…
+    i = Math.floor(Math.random() * m--);
+
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+
+  return array;
+}
+
+testing = (x) => {
+  console.log(x)
 }
 
 // Tabs for categories
-
 openCategory = (evt, categoryName) => {
   // Declare all variables
   var i, tabcontent, tablinks;

@@ -12,6 +12,9 @@ body {
   transform: translate(-50%, -50%);
 }
 
+#main-content {
+}
+
 #btn-start {
   width: 20%;
   margin-top: 4rem;
@@ -27,6 +30,7 @@ body {
 }
 
 
+/*-- Category tabs --*/
 .tab {
   float: left;
   width: 30%;
@@ -58,9 +62,3 @@ body {
   display: none;
 }
 
-/* Clear floats after the tab */
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
