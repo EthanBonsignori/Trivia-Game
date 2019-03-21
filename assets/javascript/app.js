@@ -2,8 +2,8 @@
 // select length of game (# of questions), sound effects, gifs 
 // Harder difficulty - less time to answer questions
 
-let title, subtitle, startButton, content, tab, chosenCategory, shuffledQuestions, questionCounter,
-correctAnswers, incorrectAnswers, totalCorrectAnswers, totalIncorrectAnswers;
+let title, subtitle, startButton, content, tab, chosenCategory, shuffledQuestions, questionCounter, questionText,
+qIndex, choice, correctAnswers, incorrectAnswers, totalCorrectAnswers, totalIncorrectAnswers;
 
 let categories = [
 
@@ -160,7 +160,7 @@ selectCategoryHtml = () => {
   categories.forEach( function( i ) {
     // Create buttons
     tab.append( 
-      `<button type="button" class="btn btn-outline-primary btn-lg btn-category tablinks" value="${ i.value }"  
+      `<button type="button" class="list-group-item btn-category tablinks" value="${ i.value }"  
       id="cat-btn-${i.value} "onmouseover="openCategory(event, '${ i.tabId }')">${ i.name }</button></div>`
     )
     // Create tab content to show on hover
@@ -187,28 +187,55 @@ selectCategoryHtml = () => {
 };
 
 startGame = ( cat ) => {
-  questionCounter = 1;
+  questionCounter = 0;
   // Switch subtitle to category name and display question counter
-  subtitle.fadeOut( 200, function() {
+  subtitle.fadeOut( 0, function() {
     subtitle.text( cat.name ).fadeIn( 200 );
+    console.log("question counter: " + questionCounter)
     questionCounterHtml.text( `Question ${questionCounter}` )
   } );
+  // Remove all select categories html
   removeCategories();
   // Randomize order of questions
   shuffledQuestions = shuffle( [...cat.questions] );
-  displayQuestion( shuffledQuestions );
+  content.append( `<h4 id="question"><b></b></h4>` ); // Create an element for our question to be displayed
+  questionText = $( '#question' );                    // Store the element for later use
+  displayQuestion( shuffledQuestions );     
   
   // Console log for testing purposes
   testRandom( shuffledQuestions );
 }
 
-
+// Find index of current question and display to screen
 displayQuestion = ( q ) => {
-  content.append( `<h4 id="questions"></h4>` );
-  let questions = $( '#questions' );
-  questions.text( q[0].question );
+  qIndex = (q.length - q.length) + questionCounter;
+  console.log("question index: " + qIndex)
+  questionText.text( q[qIndex].question );
+  questionCounter++; // Increment question counter so a new question is displayed on every call
+  selectAnswerHtml( q );
 }
 
+// Generates html to display each possible answer in a list
+selectAnswerHtml = ( a ) => {
+  // Randomize order of choices and store in array 
+  let choiceOrder = shuffle( [...a[qIndex].choices] );
+  // Create element to append our choices
+  content.append( `<div class="list-group"></div>` );
+  // Loop to create each choice element, every question has 4 choices so this will work on every question
+  for ( let i = 0; i < 4; i++ ) {
+    $( '.list-group' ).append(
+      `<button type="button" class="list-group-item list-group-item-action choice">${choiceOrder[i]}</button>`
+    );
+  };
+  choice = $( '.choice' )
+};
+
+// Get user click on choice
+choice.on( 'click', function() {
+  
+} );
+
+// Remove all select categories html
 removeCategories = () => {
   tab.remove();
   $( '.tabcontent' ).remove();

@@ -33,7 +33,7 @@ body {
 .tab {
   float: left;
   width: 30%;
-  height: 53%;
+  height: 48%;
   border: 1px solid #ccc;
 }
 
@@ -57,7 +57,7 @@ body {
   border: 1px solid #ccc;
   width: 70%;
   border-left: none;
-  height: 53%;
+  height: 48%;
   display: none;
 }
 
