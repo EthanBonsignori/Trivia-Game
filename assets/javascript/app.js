@@ -5,6 +5,11 @@
 let title, subtitle, startButton, content, tab, chosenCategory, shuffledQuestions, questionCounter, questionText,
 qIndex, choice, correctAnswers, incorrectAnswers, totalCorrectAnswers, totalIncorrectAnswers;
 
+correctAnswers = 0;
+incorrectAnswers = 0;
+totalCorrectAnswers = 0;
+totalIncorrectAnswers = 0;
+
 let categories = [
 
    animals = {
@@ -228,10 +233,22 @@ generateAnswerHtml = ( a ) => {
       `<button type="button" class="list-group-item list-group-item-action choice">${listNum}. ${choiceOrder[i]}</button>`
     );
   };
+
   choice = $( '.choice' )
+  choice.on( 'click', function() {
+    guess = $( this ).text().substring( 3 );
+    if ( guess === a[qIndex].answer) {
+      correctAnswers++;
+    } else {
+      incorrectAnswers++;
+    }
+    questionCounter++;
+    console.log(`Correct answers: ${correctAnswers}, Incorrect answers: ${incorrectAnswers}`)
+    $( '.list-group' ).empty();
+    displayQuestion( a );
+  } );
 };
 
-// Get user click on choice
 
 
 // Remove all select categories html
