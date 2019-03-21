@@ -71,3 +71,31 @@ body {
   color: white;
   background-color: #007bff;
 }
+
+#gif {
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+}
+
+iframe {
+
+  width: 300px;
+  height: 250px;
+}
+
+.progress {
+  margin-top: 1rem;
+  background-color: grey;
+  height: 2rem;
+}
+
+#time-remaining {
+  font-size: 1.5rem;
+  color: white;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  
+}
