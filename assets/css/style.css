@@ -10,10 +10,9 @@ body {
   width: 50%;
   height: 40%;
   transform: translate(-50%, -50%);
+  padding-top: 30px;
 }
 
-#main-content {
-}
 
 #btn-start {
   width: 20%;
@@ -34,7 +33,7 @@ body {
 .tab {
   float: left;
   width: 30%;
-  height: 57%;
+  height: 53%;
   border: 1px solid #ccc;
 }
 
@@ -58,7 +57,7 @@ body {
   border: 1px solid #ccc;
   width: 70%;
   border-left: none;
-  height: 57%;
+  height: 53%;
   display: none;
 }
 

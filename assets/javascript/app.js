@@ -2,7 +2,8 @@
 // select length of game (# of questions), sound effects, gifs 
 // Harder difficulty - less time to answer questions
 
-let title, subtitle, startButton, content, chosenCategory, randQuestionOrder;
+let title, subtitle, startButton, content, tab, chosenCategory, shuffledQuestions, questionCounter,
+correctAnswers, incorrectAnswers, totalCorrectAnswers, totalIncorrectAnswers;
 
 let categories = [
 
@@ -109,16 +110,18 @@ let categories = [
 // Create initial page html
 initHtml = () => {
   $( 'body' ).append( 
-    '<div class="container">' +
-      '<div class="jumbotron">' +
-        '<h1 class="display-3 text-center" id="title">Welcome to Trivia!</h1>' +
-        '<hr class="my-4">' +
-        '<h2 id="subtitle">Press start to begin</h1>' +
-        '<div id="main-content">' +
-          '<button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>' +
-        '</div>' +  
-      '</div>' +
-    '</div>' );
+    `<div class="container">
+        <div class="jumbotron">
+          <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
+          <hr class="my-4">
+          <h2 class="float-left" id="subtitle">Press start to begin</h2><h2 class="float-right" id="question-counter"></h2>
+          <div class="clearfix"></div>
+          <div id="main-content">
+          <button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>
+        </div>
+      </div>
+    </div>`
+  );
 };
 
 
@@ -126,11 +129,12 @@ initHtml = () => {
 initHtml();
 
 // Select elements from created html
+jumbotron = $( '.jumbotron' );
 title = $( '#title' );
 subtitle = $( '#subtitle' );
 content = $( '#main-content' );
 startButton = $( '#btn-start' );
-jumbotron = $( '.jumbotron' );
+questionCounterHtml = $( '#question-counter' )
 
 // Start the game on start button click
 $( startButton ).on( 'click', function() {
@@ -141,60 +145,85 @@ $( startButton ).on( 'click', function() {
 // Show categories
 selectCategoryHtml = () => {
   startButton.remove();
-  subtitle.text( 'Select a Category' );
+  // Animate hide and replace of text
+  title.fadeOut( 250, function() {
+    title.text( 'Topnotch Trivia' ).fadeIn( 1000 );
+  } );
+  subtitle.fadeOut( 200, function() {
+    subtitle.text( 'Select a Category' ).fadeIn( 200 );
+  } );
   // Add a tab for our category buttons
   jumbotron.append( '<div class="tab"></div>' )
-  let tab = $( '.tab' )
+  tab = $( '.tab' )
   
-  // Loop for each category, adding a button for each then their tab content"
+  // Loop for each category, adding a button for each then corresponding tab content"
   categories.forEach( function( i ) {
-    // Create button
+    // Create buttons
     tab.append( 
-        '<button type="button" class="btn btn-outline-primary btn-lg btn-category tablinks" value=' + i.value +
-         ' onmouseover="openCategory(event, ' +"'"+ i.tabId +"'" + ')">' +
-         i.name + 
-        '</button>' + 
-      '</div>' 
-    );
-    // Create tab content
+      `<button type="button" class="btn btn-outline-primary btn-lg btn-category tablinks" value="${ i.value }"  
+      id="cat-btn-${i.value} "onmouseover="openCategory(event, '${ i.tabId }')">${ i.name }</button></div>`
+    )
+    // Create tab content to show on hover
     jumbotron.append(
-      '<div id="' + i.tabId + '" class="tabcontent">' +
-      '<h4><u><b>' + i.name + '</b></u></h4>' +
-      '<h5><b>Difficulty:</b> ' + i.difficulty + '</h5>' + 
-      '<h5><b>Questions:</b> ' + i.length + '</h5>' + 
-      '<h5><b>Description:</b> ' + i.description + '</h5>'
+      `<div id="${ i.tabId }" class="tabcontent">
+      <h4><u><b>${ i.name }</b></u></h4>
+      <h5><b>Difficulty: </b>${ i.difficulty }</h5> 
+      <h5><b>Questions: </b>${ i.length }</h5> 
+      <h5><b>Description: </b>${ i.description }</h5>
+      </div>`
     )
   } );
 
   // Get player's chosen category
-  $('.btn-category').on( 'click', function() {
+  $( '.btn-category' ).on( 'click', function() {
     chosenCategory = this.value;
-    for (let i = 0; i < categories.length; i++) {
+    for ( let i = 0; i < categories.length; i++ ) {
       if ( categories[i].value == chosenCategory ) {
-        startGame(categories[i]);
+        startGame( categories[i] );
       };
     };
   } );
 
 };
 
+startGame = ( cat ) => {
+  questionCounter = 1;
+  // Switch subtitle to category name and display question counter
+  subtitle.fadeOut( 200, function() {
+    subtitle.text( cat.name ).fadeIn( 200 );
+    questionCounterHtml.text( `Question ${questionCounter}` )
+  } );
+  removeCategories();
+  // Randomize order of questions
+  shuffledQuestions = shuffle( [...cat.questions] );
+  displayQuestion( shuffledQuestions );
+  
+  // Console log for testing purposes
+  testRandom( shuffledQuestions );
+}
 
-startGame = (cat) => {
-  title.text( cat.name );
-  randQuestionOrder = shuffle( [...cat.questions] );
-  testing(randQuestionOrder);
+
+displayQuestion = ( q ) => {
+  content.append( `<h4 id="questions"></h4>` );
+  let questions = $( '#questions' );
+  questions.text( q[0].question );
+}
+
+removeCategories = () => {
+  tab.remove();
+  $( '.tabcontent' ).remove();
 }
 
 // Randomize the order of the questions so the questions appear in a different order on each game
-// Fisher-Yates Shuffle  
-shuffle = (array) => {
+// Fisher-Yates  
+shuffle = ( array ) => {
   var m = array.length, t, i;
 
   // While there remain elements to shuffle…
-  while (m) {
+  while ( m ) {
 
     // Pick a remaining element…
-    i = Math.floor(Math.random() * m--);
+    i = Math.floor(Math.random() * m-- );
 
     // And swap it with the current element.
     t = array[m];
@@ -205,12 +234,12 @@ shuffle = (array) => {
   return array;
 }
 
-testing = (x) => {
-  console.log(x)
+testRandom = (x) => {
+  console.log( "Shuffled questions array: " + JSON.stringify(x) )
 }
 
-// Tabs for categories
-openCategory = (evt, categoryName) => {
+// Tabs for categories on mouseover
+openCategory = ( event, categoryName ) => {
   // Declare all variables
   var i, tabcontent, tablinks;
 
@@ -228,7 +257,7 @@ openCategory = (evt, categoryName) => {
 
   // Show the current tab, and add an "active" class to the link that opened the tab
   document.getElementById(categoryName).style.display = "block";
-  evt.currentTarget.className += " active";
+  event.currentTarget.className += " active";
 }
 
 
