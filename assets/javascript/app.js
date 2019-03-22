@@ -8,11 +8,13 @@
 // Declaring variables
 let
 // Html elements
-title, subtitle, content, tab, gifDiv, questionText, chosenCategory, choice, timerBar,
+title, divider, subtitle, content, tab, gifDiv, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, 
+shuffledQuestions, questionIndex, questionCounter, questionTime, gifTimeoutId,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
+// Intervals & Timeouts
+questionIntervalId, questionTimerId, smoothInterval, gidTimeoutId, 
 // Difficulties (seconds)
 difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 
@@ -197,7 +199,7 @@ generateInitialHtml = () => {
     `<div class="container">
         <div class="jumbotron" id="jumbo">
           <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
-          <hr class="my-4">
+          <hr class="my-4" id="divider">
           <h2 class="float-left" id="subtitle">Press start to begin</h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
@@ -214,6 +216,7 @@ generateInitialHtml();
 // Select elements from created html
 jumbotron = $( '.jumbotron' );
 title = $( '#title' );
+divider = $( '#divider' )
 subtitle = $( '#subtitle' );
 content = $( '#main-content' );
 questionCounterHtml = $( '#question-counter' )
@@ -280,20 +283,22 @@ startGame = ( category ) => {
   questionCounterHtml.text( `Question ${questionCounter + 1}` ).hide();
   // Switch subtitle to category name and display question counter
   subtitle.fadeOut( 0, function() {
-    subtitle.text( category.name ).fadeIn( 200 );
-    questionCounterHtml.fadeIn( 200 );
+    subtitle.text( category.name ).fadeIn( 300 );
+    questionCounterHtml.fadeIn( 300 );
       } );
   // Remove all select categories html
   removeCategories();
   // Randomize order of questions
   shuffledQuestions = shuffle( [...category.questions] );
-  content.append( `<h4 id="question"><b></b></h4>` ); // Create an element for our question to be displayed
-  questionText = $( '#question' );                    // Store the element for later use
+               
   displayQuestion( shuffledQuestions );    
 }
 
 // Find index of current question and display to screen
 displayQuestion = ( qs ) => {
+  questionCounterHtml.text( `Question ${questionCounter + 1}` )
+  content.append( `<h4 id="question"><b></b></h4>` );
+  questionText = $( '#question' );   
   questionIndex = questionCounter;
   questionText.text( qs[questionIndex].question );
   questionCounter++; // Increment question counter so a new question is displayed on every call
@@ -312,14 +317,16 @@ getChoices = ( q ) => {
       incorrectAnswer();
     }
     $( '.list-group' ).remove();
+    showGif();
     clearInterval( questionIntervalId );
     clearTimeout( questionTimerId );
     clearInterval( smoothInterval );
   } );
 };
 
-questionTime = chosenDifficulty * 1000; 
 questionTimer = () => {
+  questionTime = chosenDifficulty * 1000;
+  seconds = chosenDifficulty;
   questionIntervalId = setInterval( updateTimerBar, 1000 );
   questionTimerId = setTimeout( function() {
     timeUp() 
@@ -355,19 +362,15 @@ generateTimerBar = () => {
 // Run on correct player guess
 correctAnswer = () => {
   correctAnswers++;
-  questionCounter++;
   console.log( `Correct answer. Total: ${correctAnswers}` )
-  questionText.text( `Correct!` )
-  showGif();
+  questionText.html( `Correct!` )
 }
 
 // Run on incorrect player guess
 incorrectAnswer = () => {
   incorrectAnswers++;
-  questionCounter++;
-  questionText.html( `Incorrect! The correct answer was: <b>${shuffledQuestions[0].answer}</b>` )
+  questionText.html( `Incorrect! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Incorrect answer. Total: ${incorrectAnswers}`)
-  showGif();
 }
 
 // Run when question timer runs out
@@ -375,18 +378,36 @@ timeUp = () => {
   clearInterval(questionIntervalId);
   clearTimeout(questionTimerId);
   clearInterval(smoothInterval);
-  questionCounter++;
+  showGif();
   unanswered++;
   console.log("Time's up")
   $( '.list-group' ).remove();
-  questionText.html( `You ran out of time! The correct answer was: <b>${shuffledQuestions[0].answer}</b>` )
-  showGif();
+  questionText.html( `You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
 }
 
 showGif = () => {
-  content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[questionIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` )
-  gifDiv = $( '#gif' )
+  content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[questionIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` );
+  gifDiv = $( '#gif' );
+  clearTimeout( gifTimeoutId )
+  setGifTimeout();
 }
+
+setGifTimeout = () => {
+  gifTimeoutId = setTimeout( function() {
+    if ( shuffledQuestions.length - 1 === questionIndex ) {
+      endRound();
+    } else {
+      displayQuestion( shuffledQuestions );
+      questionTimer();
+    }
+    gifDiv.remove();
+  }, 6 * 1000 );
+};
+
+endRound = () => {
+  content.empty();
+  content.append( `<h1> Round Over!!! </h1>` )
+};
 
 // Randomize the order of input array so questions/choices appear in a different order on each game
 // Fisher-Yates Shuffle
@@ -415,13 +436,11 @@ let fullPercent = ( barWidth / seconds ); // Get full number to subtract bar wid
 let smoothPercent = ( ( fullPercent / 100 ) * 17 ); // Get 17% of that number so we can run it 17 times to smooth it out
 let subtractWidth = ( Math.floor( smoothPercent * 100 ) / 100 );  // Remove the unesecary decimal places so we have a clean number
 // Update a bootstrap timerbar so that it's width equals the percentage of time remaining every second
-console.log(subtractWidth)
 updateTimerBar = () => {
   timerBar = $( '#timer-bar' );
 
   // Update text of timer bar
   remainingTime = seconds-- -1;
-  console.log("seconds remaining: " + seconds)
   let remainingTimeSelector = $( '#time-remaining' );
   if ( remainingTime > 1 ) {
     remainingTimeSelector.text( `${remainingTime} seconds` );
@@ -431,23 +450,21 @@ updateTimerBar = () => {
 
   // Animate bar color
   if ( remainingTime === 8 ) {
-    // timerBar.css( 'background-color', '#eeff00' )
     timerBar.addClass( 'yellow' )
   } else if ( remainingTime === 3 ) {
     timerBar.addClass( 'red' )
-    // timerBar.css( 'background-color', '#ff0000' )  
   };
 };
 
 startTimerBarSmooth = () => { 
   smoothInterval = setInterval( smoothSubtract, 50 )
+  w = 100;
 }
 
 let w = 100;
 smoothSubtract = () => {
   timerBar = $( '#timer-bar' );
   w -= 0.25;
-  console.log("width:" + w)
   timerBar.css( 'width', `${w}%` )
 }
 
@@ -481,9 +498,11 @@ removeCategories = () => {
 
 // Some fun animations
 jumbotronAnimate = () => {
+  title.fadeIn( 500 );
   jumbotron.animate( {
     backgroundColor: "#e9ecef",
   }, 3000, () => {
+    divider.fadeIn( 2000 );
     jumbotron.animate( {
       height: '50vh'
     }, 2000, () => {
