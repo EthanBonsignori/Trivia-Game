@@ -10,7 +10,7 @@ let
 // Html elements
 title, divider, subtitle, content, tab, gifDiv, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, gifTimeoutId,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, gifTimeoutId, firstGame,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
@@ -21,8 +21,7 @@ difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 totalCorrectAnswers = 0;
 totalIncorrectAnswers = 0;
 totalUnanswered = 0;
-
-
+firstGame = true;
 
 // May add chosen difficulty later
 difficultyEasy = 30;
@@ -43,7 +42,7 @@ let categories = [
       { 
         question: "What is the name for a collective group of lions?",
         answer: "Pride",
-        choices: ["Pride", "Flock", "Herd", "Group"],
+        choices: ["Pride", "Flock", "Herd", "Run & Hide"],
         gif: "12Iabt4Yt9hSUM",
       },
       { 
@@ -191,8 +190,6 @@ initVars = () => {
   unanswered = 0;
 }
 
-initVars();
-
 // Create initial page html
 generateInitialHtml = () => {
   $( 'body' ).append( 
@@ -231,10 +228,14 @@ $( document ).on( 'click', '#btn-start', function() {
 
 // Show categories
 selectCategoryHtml = () => {
-  // Animate hide and replace of text
-  title.fadeOut( 250, function() {
-    title.text( 'Topnotch Trivia' ).fadeIn( 1000 );
-  } );
+  if ( firstGame ) {
+    // Animate hide and replace of title text
+    title.fadeOut( 250, function() {
+      title.text( 'Topnotch Trivia' ).fadeIn( 1000 );
+    } );
+  }
+  firstGame = false;
+  // Animate hide and replace of subtitle text
   subtitle.fadeOut( 200, function() {
     subtitle.text( 'Select a Category' ).fadeIn( 200 );
   } );
@@ -263,11 +264,11 @@ selectCategoryHtml = () => {
     )
   } );
 
-
-
   // Get player's chosen category
   $( '.btn-category' ).on( 'click', function() {
     chosenValue = this.value;
+    content.append( `<h4 id="question"></h4>` );
+    questionText = $( '#question' );
     for ( let i = 0; i < categories.length; i++ ) {
       if ( categories[i].value == chosenValue ) {
         chosenCategory = categories[i];
@@ -279,6 +280,7 @@ selectCategoryHtml = () => {
 };
 
 startGame = ( category ) => {
+  initVars();
   questionCounter = 0;
   questionCounterHtml.text( `Question ${questionCounter + 1}` ).hide();
   // Switch subtitle to category name and display question counter
@@ -296,9 +298,7 @@ startGame = ( category ) => {
 
 // Find index of current question and display to screen
 displayQuestion = ( qs ) => {
-  questionCounterHtml.text( `Question ${questionCounter + 1}` )
-  content.append( `<h4 id="question"><b></b></h4>` );
-  questionText = $( '#question' );   
+  questionCounterHtml.text( `Question ${questionCounter + 1}` ) 
   questionIndex = questionCounter;
   questionText.text( qs[questionIndex].question );
   questionCounter++; // Increment question counter so a new question is displayed on every call
@@ -401,13 +401,10 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, 6 * 1000 );
+  }, 500 );
 };
 
-endRound = () => {
-  content.empty();
-  content.append( `<h1> Round Over!!! </h1>` )
-};
+
 
 // Randomize the order of input array so questions/choices appear in a different order on each game
 // Fisher-Yates Shuffle
@@ -495,6 +492,50 @@ removeCategories = () => {
   tab.remove();
   $( '.tabcontent' ).remove();
 }
+
+endRound = () => {
+  questionCounterHtml.animate( { 
+    opacity: 0
+  }, 1000 );
+  
+  jumbotron.animate( {
+    height: '15vh'
+  }, 3000, () => {
+    delayTwo = setTimeout( function() {
+      appendStats();
+      jumbotron.animate( {
+        height: '50vh'
+      }, 3000 );
+    }, 2000 );
+  } );
+
+  subtitle.fadeOut( 0, function() {
+    subtitle.text( 'Let\'s see how you did...' ).fadeIn( 2000 );
+    questionText.text( '' );
+  } );
+};
+
+appendStats = () => {
+  totalCorrectAnswers += correctAnswers;
+  totalIncorrectAnswers += incorrectAnswers;
+  totalUnanswered += unanswered;
+  content.append( `
+    <div class="float-left" id="stats-round">
+      <h1><u>This Round</u></h1>
+      <h4>Correct: <b>${correctAnswers}</b></h4>
+      <h4>Inorrect: <b>${incorrectAnswers}</b></h4>
+      <h4>Unanswered: <b>${unanswered}</b></h4>
+    </div>
+    <div class="float-right" id="stats-overall">
+      <h1><u>Overall</u></h1>
+      <h4>Correct: <b>${totalCorrectAnswers}</b></h4>
+      <h4>Inorrect: <b>${totalIncorrectAnswers}</b></h4>
+      <h4>Unanswered: <b>${totalUnanswered}</b></h4>
+    </div>
+    <div class="clearfix"></div>
+  ` ).hide().fadeIn( 1000 ) 
+  clearTimeout( delayTwo );
+};
 
 // Some fun animations
 jumbotronAnimate = () => {
