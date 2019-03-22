@@ -78,6 +78,7 @@ body {
 .progress {
   margin-top: 1rem;
   background-color: grey;
+  box-shadow: inset 0 0 2px #000000;
   height: 2rem;
 }
 
