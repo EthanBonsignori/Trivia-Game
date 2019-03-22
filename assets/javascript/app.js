@@ -401,7 +401,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, 500 );
+  }, 6000 );
 };
 
 
