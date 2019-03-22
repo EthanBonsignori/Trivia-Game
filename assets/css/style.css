@@ -1,34 +1,36 @@
 body {
-  background: url(../images/bananas.png);
+  height: 100vh;
+  background-image: 
+  linear-gradient(
+    to bottom left,
+  #18487a, #004b9b, #007bff);
 }
-
 
 .jumbotron {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 50%;
-  height: 65%;
+  height: 13vh;
   transform: translate(-50%, -50%);
   padding-top: 1rem;
-  
+  background-color: #007bff;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
+#title {
+  color: #ffffff;
+}
+
+#subtitle {
+  display: none;
+}
 
 #btn-start {
-  width: 20%;
+  width: 100%;
+  height: 200px;
   margin-top: 4rem;
-  margin-left: 40%;
-  margin-right: 40%;
 }
-
-/*-- Countdown Timer --*/
-#countdown {
-  position: relative;
-  margin: auto;
-  text-align: center;
-}
-
 
 /*-- Category tabs --*/
 .tab {
@@ -72,19 +74,7 @@ body {
   background-color: #007bff;
 }
 
-#gif {
-  align-items: center;
-  margin-left: auto;
-  margin-right: auto;
-  width: 300px;
-}
-
-iframe {
-
-  width: 300px;
-  height: 250px;
-}
-
+/*-- Timer Bar --*/
 .progress {
   margin-top: 1rem;
   background-color: grey;
@@ -97,5 +87,56 @@ iframe {
   position: absolute;
   left: 0;
   width: 100%;
-  
+}
+
+#timer-bar {
+  background-color: #007bff;
+  -webkit-transition: background-color 0.8s;
+  -moz-transition: background-color 0.8s;
+  transition: background-color 0.8s;
+}
+
+.yellow {
+  background-color: #ffa600 !important;
+}
+
+.red {
+  background-color: #ff0000 !important;
+}
+
+/*-- Gifs --*/
+#gif {
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+}
+
+iframe {
+  width: 300px;
+  height: 250px;
+}
+
+/*-- Media Queries --*/
+@media (max-width: 1824px) {
+  #title {
+    font-size: 4rem;
+  }
+}
+@media (max-width: 1635px) {
+  #title {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 1447px) {
+  #title {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 1258px) {
+  #title {
+    font-size: 2.5rem;
+  }
 }

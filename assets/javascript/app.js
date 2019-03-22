@@ -8,28 +8,25 @@
 // Declaring variables
 let
 // Html elements
-title, subtitle, startButton, content, tab, gifDiv, questionText, chosenCategory, choice
+title, subtitle, content, tab, gifDiv, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionCounter, questionTime, qIndex, 
-// integers
-correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered;
-
+shuffledQuestions, questionIndex, questionCounter, questionTime, 
+// Answers
+correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
+// Difficulties (seconds)
+difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 
 totalCorrectAnswers = 0;
 totalIncorrectAnswers = 0;
 totalUnanswered = 0;
 
-initVars = () => {
-  correctAnswers = 0;
-  incorrectAnswers = 0;
-  unanswered = 0;
-}
+
 
 // May add chosen difficulty later
-diffEasy = 30;
-diffMedium = 20; 
-diffHard = 10;
-diffChosen = diffMedium;
+difficultyEasy = 30;
+difficultyMedium = 20; 
+difficultyHard = 10;
+chosenDifficulty = difficultyMedium;
 
 let categories = [
 
@@ -186,6 +183,13 @@ let categories = [
 
 ];
 
+initVars = () => {
+  correctAnswers = 0;
+  incorrectAnswers = 0;
+  unanswered = 0;
+}
+
+initVars();
 
 // Create initial page html
 generateInitialHtml = () => {
@@ -197,13 +201,11 @@ generateInitialHtml = () => {
           <h2 class="float-left" id="subtitle">Press start to begin</h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
-          <button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>
         </div>
       </div>
     </div>`
   );
 };
-
 
 // Run first so we can select elements
 generateInitialHtml();
@@ -214,19 +216,18 @@ jumbotron = $( '.jumbotron' );
 title = $( '#title' );
 subtitle = $( '#subtitle' );
 content = $( '#main-content' );
-startButton = $( '#btn-start' );
 questionCounterHtml = $( '#question-counter' )
 
 
 // Start the game on start button click
-$( startButton ).on( 'click', function() {
+$( document ).on( 'click', '#btn-start', function() {
   console.log( 'Game Started' )
   selectCategoryHtml();
+  this.remove();
 } );
 
 // Show categories
 selectCategoryHtml = () => {
-  startButton.remove();
   // Animate hide and replace of text
   title.fadeOut( 250, function() {
     title.text( 'Topnotch Trivia' ).fadeIn( 1000 );
@@ -288,13 +289,13 @@ startGame = ( category ) => {
   shuffledQuestions = shuffle( [...category.questions] );
   content.append( `<h4 id="question"><b></b></h4>` ); // Create an element for our question to be displayed
   questionText = $( '#question' );                    // Store the element for later use
-  displayQuestion( shuffledQuestions );     
+  displayQuestion( shuffledQuestions );    
 }
 
 // Find index of current question and display to screen
 displayQuestion = ( qs ) => {
-  qIndex = questionCounter;
-  questionText.text( qs[qIndex].question );
+  questionIndex = questionCounter;
+  questionText.text( qs[questionIndex].question );
   questionCounter++; // Increment question counter so a new question is displayed on every call
   getChoices( qs );
 }
@@ -305,45 +306,30 @@ getChoices = ( q ) => {
   choice = $( '.choice' )
   choice.on( 'click', function() {
     guess = $( this ).text().substring( 3 );
-    if ( guess === q[qIndex].answer) {
+    if ( guess === q[questionIndex].answer) {
       correctAnswer();
     } else {
       incorrectAnswer();
     }
     $( '.list-group' ).remove();
-    clearInterval(questionIntervalId);
-    clearTimeout(questionTimerId);
-
+    clearInterval( questionIntervalId );
+    clearTimeout( questionTimerId );
+    clearInterval( smoothInterval );
   } );
 };
 
-
-questionTime = 1000 * diffChosen; 
+questionTime = chosenDifficulty * 1000; 
 questionTimer = () => {
   questionIntervalId = setInterval( updateTimerBar, 1000 );
   questionTimerId = setTimeout( function() {
     timeUp() 
   }, questionTime )
+ startTimerBarSmooth();
 }
-
-
-
-let barWidth = 100;
-let seconds = diffChosen;
-let percent = barWidth / seconds;
-updateTimerBar = () => {
-  barWidth -= percent;
-  remainingTime = seconds -= 1;
-  document.getElementById( 'timer-bar' ).style.width = `${barWidth}%`;
-  if ( remainingTime >= 0 ) {
-    document.getElementById( 'time-remaining' ).innerHTML = `${remainingTime}`;
-  };
-} 
-
 
 generateChoiceHtml = ( q ) => {
   // Randomize order of choices and store in array 
-  let choiceOrder = shuffle( [...q[qIndex].choices] );
+  let choiceOrder = shuffle( [...q[questionIndex].choices] );
   // Create element to append our choices
   content.append( `<div class="list-group"></div>` );
   // Loop to create each choice element, every question has 4 choices so this will work on every question
@@ -358,13 +344,13 @@ generateChoiceHtml = ( q ) => {
  }
 
 generateTimerBar = () => {
-  $( '.list-group' ).append( `
-  <div class="progress">
-    <div class="progress-bar" id="timer-bar" role="progressbar" style="width: 100%;">
-      <p id="time-remaining">${questionTime / 1000}</p>
+  $( '.list-group' ).append( 
+    `<div class="progress">
+    <div class="progress-bar" id="timer-bar" role="progressbar" style="width: 100%">
+      <p id="time-remaining">${questionTime / 1000} seconds</p>
     </div>
   </div>` )
-}
+};
 
 // Run on correct player guess
 correctAnswer = () => {
@@ -386,6 +372,9 @@ incorrectAnswer = () => {
 
 // Run when question timer runs out
 timeUp = () => {
+  clearInterval(questionIntervalId);
+  clearTimeout(questionTimerId);
+  clearInterval(smoothInterval);
   questionCounter++;
   unanswered++;
   console.log("Time's up")
@@ -395,9 +384,10 @@ timeUp = () => {
 }
 
 showGif = () => {
-  content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[qIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` )
+  content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[questionIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` )
   gifDiv = $( '#gif' )
 }
+
 // Randomize the order of input array so questions/choices appear in a different order on each game
 // Fisher-Yates Shuffle
 shuffle = ( array ) => {
@@ -418,6 +408,48 @@ shuffle = ( array ) => {
   return array;
 }
 
+// Declare and set variables needed for the updateTimerBar function
+let barWidth = 100; // Bar starts at 100%
+let seconds = chosenDifficulty; // Same value, different name (so it makes more sense in context)
+let fullPercent = ( barWidth / seconds ); // Get full number to subtract bar width by each interval
+let smoothPercent = ( ( fullPercent / 100 ) * 17 ); // Get 17% of that number so we can run it 17 times to smooth it out
+let subtractWidth = ( Math.floor( smoothPercent * 100 ) / 100 );  // Remove the unesecary decimal places so we have a clean number
+// Update a bootstrap timerbar so that it's width equals the percentage of time remaining every second
+console.log(subtractWidth)
+updateTimerBar = () => {
+  timerBar = $( '#timer-bar' );
+
+  // Update text of timer bar
+  remainingTime = seconds-- -1;
+  console.log("seconds remaining: " + seconds)
+  let remainingTimeSelector = $( '#time-remaining' );
+  if ( remainingTime > 1 ) {
+    remainingTimeSelector.text( `${remainingTime} seconds` );
+  } else {
+    remainingTimeSelector.text( `${remainingTime} second` );
+  };
+
+  // Animate bar color
+  if ( remainingTime === 8 ) {
+    // timerBar.css( 'background-color', '#eeff00' )
+    timerBar.addClass( 'yellow' )
+  } else if ( remainingTime === 3 ) {
+    timerBar.addClass( 'red' )
+    // timerBar.css( 'background-color', '#ff0000' )  
+  };
+};
+
+startTimerBarSmooth = () => { 
+  smoothInterval = setInterval( smoothSubtract, 50 )
+}
+
+let w = 100;
+smoothSubtract = () => {
+  timerBar = $( '#timer-bar' );
+  w -= 0.25;
+  console.log("width:" + w)
+  timerBar.css( 'width', `${w}%` )
+}
 
 // Tabs for categories on mouseover
 openCategory = ( event, categoryName ) => {
@@ -447,4 +479,28 @@ removeCategories = () => {
   $( '.tabcontent' ).remove();
 }
 
-initVars();
+// Some fun animations
+jumbotronAnimate = () => {
+  jumbotron.animate( {
+    backgroundColor: "#e9ecef",
+  }, 3000, () => {
+    jumbotron.animate( {
+      height: '50vh'
+    }, 2000, () => {
+    content.append( 
+      `<button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>` )
+      .hide()
+      .fadeIn( 1000 );
+      subtitle.fadeIn( 1000 )
+    } );
+  } );
+
+  title.animate( {
+    color: "#000"
+  }, 3000 );
+
+
+}
+
+jumbotronAnimate();
+
