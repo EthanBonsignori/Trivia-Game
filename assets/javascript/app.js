@@ -1,20 +1,35 @@
-// Possible features: Bar display on timer instead of number only, random order to questions and answers,
-// select length of game (# of questions), sound effects, gifs 
-// Harder difficulty - less time to answer questions
+// Possible features: 
+// (DONE)Bar display on timer instead of number only, 
+// (DONE)Random order to questions and answers,
+// Select difficulty of game - how much time on each question
+// Sound effects and/or music
+// (DONE)Gifs relating to each question when answered 
 
-let title, subtitle, startButton, content, tab, chosenCategory, questionTime, 
-shuffledQuestions, questionCounter, questionText,
-qIndex, choice, correctAnswers, incorrectAnswers, totalCorrectAnswers, totalIncorrectAnswers;
+// Declaring variables
+let
+// Html elements
+title, subtitle, startButton, content, tab, gifDiv, questionText, chosenCategory, choice
+// Data
+shuffledQuestions, questionCounter, questionTime, qIndex, 
+// integers
+correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered;
 
-correctAnswers = 0;
-incorrectAnswers = 0;
+
 totalCorrectAnswers = 0;
 totalIncorrectAnswers = 0;
+totalUnanswered = 0;
 
-let diffEasy = 30;
-let diffMedium = 20; 
-let diffHard = 10;
-let diffChosen = diffMedium;
+initVars = () => {
+  correctAnswers = 0;
+  incorrectAnswers = 0;
+  unanswered = 0;
+}
+
+// May add chosen difficulty later
+diffEasy = 30;
+diffMedium = 20; 
+diffHard = 10;
+diffChosen = diffMedium;
 
 let categories = [
 
@@ -33,7 +48,7 @@ let categories = [
         gif: "12Iabt4Yt9hSUM",
       },
       { 
-        question: "What type of animal is a Portugeuse man o' war?",
+        question: "What type of animal is a Portuguese man o' war?",
         answer: "Jellyfish",
         choices: ["Jellyfish", "Snail", "Dolphin", "It's not an animal"],
         gif: "mlYRUYfJKpINW",
@@ -176,7 +191,7 @@ let categories = [
 generateInitialHtml = () => {
   $( 'body' ).append( 
     `<div class="container">
-        <div class="jumbotron">
+        <div class="jumbotron" id="jumbo">
           <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
           <hr class="my-4">
           <h2 class="float-left" id="subtitle">Press start to begin</h2><h2 class="float-right" id="question-counter"></h2>
@@ -193,6 +208,7 @@ generateInitialHtml = () => {
 // Run first so we can select elements
 generateInitialHtml();
 
+
 // Select elements from created html
 jumbotron = $( '.jumbotron' );
 title = $( '#title' );
@@ -200,6 +216,7 @@ subtitle = $( '#subtitle' );
 content = $( '#main-content' );
 startButton = $( '#btn-start' );
 questionCounterHtml = $( '#question-counter' )
+
 
 // Start the game on start button click
 $( startButton ).on( 'click', function() {
@@ -289,13 +306,14 @@ getChoices = ( q ) => {
   choice.on( 'click', function() {
     guess = $( this ).text().substring( 3 );
     if ( guess === q[qIndex].answer) {
-      correctAnswer( q );
+      correctAnswer();
     } else {
-      incorrectAnswer( q );
+      incorrectAnswer();
     }
     $( '.list-group' ).remove();
     clearInterval(questionIntervalId);
     clearTimeout(questionTimerId);
+
   } );
 };
 
@@ -336,6 +354,10 @@ generateChoiceHtml = ( q ) => {
     );
   };
   // Create element to display our timer
+  generateTimerBar()
+ }
+
+generateTimerBar = () => {
   $( '.list-group' ).append( `
   <div class="progress">
     <div class="progress-bar" id="timer-bar" role="progressbar" style="width: 100%;">
@@ -344,7 +366,8 @@ generateChoiceHtml = ( q ) => {
   </div>` )
 }
 
-correctAnswer = ( q ) => {
+// Run on correct player guess
+correctAnswer = () => {
   correctAnswers++;
   questionCounter++;
   console.log( `Correct answer. Total: ${correctAnswers}` )
@@ -352,7 +375,8 @@ correctAnswer = ( q ) => {
   showGif();
 }
 
-incorrectAnswer = ( q ) => {
+// Run on incorrect player guess
+incorrectAnswer = () => {
   incorrectAnswers++;
   questionCounter++;
   questionText.html( `Incorrect! The correct answer was: <b>${shuffledQuestions[0].answer}</b>` )
@@ -360,8 +384,10 @@ incorrectAnswer = ( q ) => {
   showGif();
 }
 
+// Run when question timer runs out
 timeUp = () => {
   questionCounter++;
+  unanswered++;
   console.log("Time's up")
   $( '.list-group' ).remove();
   questionText.html( `You ran out of time! The correct answer was: <b>${shuffledQuestions[0].answer}</b>` )
@@ -370,6 +396,7 @@ timeUp = () => {
 
 showGif = () => {
   content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[qIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` )
+  gifDiv = $( '#gif' )
 }
 // Randomize the order of input array so questions/choices appear in a different order on each game
 // Fisher-Yates Shuffle
@@ -419,3 +446,5 @@ removeCategories = () => {
   tab.remove();
   $( '.tabcontent' ).remove();
 }
+
+initVars();
