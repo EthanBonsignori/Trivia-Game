@@ -197,9 +197,10 @@ generateInitialHtml = () => {
         <div class="jumbotron" id="jumbo">
           <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
           <hr class="my-4" id="divider">
-          <h2 class="float-left" id="subtitle">Press start to begin</h2><h2 class="float-right" id="question-counter"></h2>
+          <h2 class="float-left" id="subtitle"></h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
+          <button type="button" class="btn btn-outline-primary btn-lg text-center" id="btn-start">Start</button>
         </div>
       </div>
     </div>`
@@ -218,30 +219,22 @@ subtitle = $( '#subtitle' );
 content = $( '#main-content' );
 questionCounterHtml = $( '#question-counter' )
 
-
-// Start the game on start button click
-$( document ).on( 'click', '#btn-start', function() {
-  console.log( 'Game Started' )
-  selectCategoryHtml();
-  this.remove();
-} );
-
 // Show categories
 selectCategoryHtml = () => {
   if ( firstGame ) {
     // Animate hide and replace of title text
-    title.fadeOut( 250, function() {
-      title.text( 'Topnotch Trivia' ).fadeIn( 1000 );
+    title.fadeOut( 500, function() {
+      title.text( 'Topnotch Trivia' ).fadeIn( 3000 );
     } );
   }
   firstGame = false;
   // Animate hide and replace of subtitle text
   subtitle.fadeOut( 200, function() {
-    subtitle.text( 'Select a Category' ).fadeIn( 200 );
+    subtitle.text( 'Select a Category' ).hide();
   } );
   // Add a tab for our category buttons
-  jumbotron.append( '<div class="tab"></div>' )
-  tab = $( '.tab' )
+  jumbotron.append( '<div class="tab" style="display: none"></div>' );
+  tab = $( '.tab' );
   
   // Loop for each category, adding a button for each then corresponding tab content"
   categories.forEach( function( i ) {
@@ -539,28 +532,33 @@ appendStats = () => {
 
 // Some fun animations
 jumbotronAnimate = () => {
-  title.fadeIn( 500 );
   jumbotron.animate( {
     backgroundColor: "#e9ecef",
   }, 3000, () => {
     divider.fadeIn( 2000 );
     jumbotron.animate( {
-      height: '50vh'
+      height: '65vh'
     }, 2000, () => {
-    content.append( 
-      `<button type="button" class="btn btn-outline-primary btn-lg" id="btn-start">Start</button>` )
-      .hide()
-      .fadeIn( 1000 );
       subtitle.fadeIn( 1000 )
+      tab.show( 'slow' )
     } );
-  } );
-
-  title.animate( {
+   } )
+   title.animate( {
     color: "#000"
   }, 3000 );
-
-
+ 
+} 
+ 
+titleAnimate = () => {
+  title.fadeIn( 500 );
 }
 
-jumbotronAnimate();
+titleAnimate();
 
+// Start the game on start button click
+$( document ).on( 'click', '#btn-start', function() {
+  console.log( 'Game Started' )
+  jumbotronAnimate();
+  selectCategoryHtml();
+  this.remove();
+} );
