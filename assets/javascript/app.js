@@ -263,10 +263,10 @@ generateCategoryHtml = () => {
     // Create tab content to show on hover
     jumbotron.append(
       `<div id="${ i.tabId }" class="tabcontent">
-      <h4><u><b>${ i.name }</b></u></h4>
-      <h5><b>Difficulty: </b>${ i.difficulty }</h5> 
-      <h5><b>Questions: </b>${ i.length }</h5> 
-      <h5>${ i.description }</h5>
+      <h5><b>${ i.name }</b></h4>
+      <h6><b>Difficulty: </b>${ i.difficulty }</h5> 
+      <h6><b>Questions: </b>${ i.length }</h5> 
+      <h6>${ i.description }</h5>
       </div>`
     )
   } );
@@ -432,7 +432,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, 60 );
+  }, 6000 );
 };
 
 
@@ -535,7 +535,7 @@ endRound = () => {
   
   jumbotron.animate( {
     height: '20vh'
-  }, 3000, () => {
+  }, 2000, () => {
     setTimeout( () => {
       appendStats();
       jumbotron.animate( {
@@ -548,7 +548,7 @@ endRound = () => {
     subtitle.fadeOut( 500, () => {
       subtitle.text( `Let's see how you did...` ).fadeIn( 2000 );
     } );
-  }, 3000 );
+  }, 2300 );
   
 };
 
@@ -576,7 +576,7 @@ appendStats = () => {
     <div class="container" id="btn-container">
       <button type="button" class="btn btn-primary btn-lg" id="btn-restart">Play Again</button>
     </div> 
-  `).hide().fadeIn( 3000 );
+  `).hide().fadeIn( 2000 );
 };
 
 $( document ).on( 'click', '#btn-restart', () => {
@@ -584,8 +584,11 @@ $( document ).on( 'click', '#btn-restart', () => {
   content.empty();
   restartAnimate();
   generateCategoryHtml();
-  jumbotronAnimate();
-} )
+  setTimeout( () => {
+    subtitle.fadeIn( 1000 )
+    tab.show( )
+  }, 2500 );
+} );
 
 // Some fun animations
 jumbotronAnimate = () => {
@@ -611,11 +614,11 @@ titleAnimate = () => {
 }
 
 restartAnimate = () => {
-  jumbotron.animate( { backgroundColor: "#007bff" }, 1500, () => 
-    { jumbotron.animate( { backgroundColor: "#e9ecef" }, 1500 ) } 
+  jumbotron.animate( { backgroundColor: "#007bff" }, 2000, () => 
+    { jumbotron.animate( { backgroundColor: "#e9ecef" }, 2000 ) } 
   );
-  title.animate( { color: '#ffffff' }, 1500, () => 
-    { title.animate( { color: '#000' }, 1500 ) } 
+  title.animate( { color: '#ffffff' }, 2000, () => 
+    { title.animate( { color: '#000' }, 2000 ) } 
   );
 };
 
