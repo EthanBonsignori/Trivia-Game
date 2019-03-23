@@ -8,7 +8,7 @@
 // Declaring variables
 let
 // Html elements
-title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, questionText, chosenCategory, choice, timerBar,
+title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, gifTimerBar, questionText, chosenCategory, choice, timerBar,
 // Data
 shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, gifTime,
 // Answers
@@ -443,14 +443,19 @@ showGifTime = () => {
   gifTimerContainer = $( '#gif-timer-container' )
   for ( let n = 0; n < gifTime; n++ ) {
     gifTimerContainer.append( `<div class="gif-timer-bar" id="gif-timer-${n}"><div>` )
-  }  
+  } 
+  gifTimerBar = $( '.gif-timer-bar' )
   gifInterval = setInterval( removeLastGifTimeDiv, 1000 )
 }
-let gifTimerId = 6;
+let gifTimerId = 5;
 removeLastGifTimeDiv = () => {
   console.log(gifTimerId)
-  // (`${gifTimerContainer}:nth-child(${gifTimerId}`).remove();
+  gifTimerBar.last().remove();
   gifTimerId--;
+
+  if (gifTimerId === 0) {
+    clearInterval(gifInterval);
+  }
 }
 
 // Randomize the order of input array so questions/choices appear in a different order on each game
