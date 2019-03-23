@@ -8,13 +8,13 @@
 // Declaring variables
 let
 // Html elements
-title, divider, subtitle, content, tab, gifDiv, questionText, chosenCategory, choice, timerBar,
+title, divider, subtitle, content, startButton, tab, categoryButtonSelector, gifDiv, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, gifTimeoutId, firstGame,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, gifTimeoutId, firstGame, countdownSeconds,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
-questionIntervalId, questionTimerId, smoothInterval, gidTimeoutId, 
+countdownIntervalId, questionIntervalId, questionTimerId, smoothInterval, gidTimeoutId, 
 // Difficulties (seconds)
 difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 
@@ -188,6 +188,8 @@ initVars = () => {
   correctAnswers = 0;
   incorrectAnswers = 0;
   unanswered = 0;
+  countdownSeconds = 3;
+  questionTime = chosenDifficulty * 1000;
 }
 
 // Create initial page html
@@ -200,7 +202,9 @@ generateInitialHtml = () => {
           <h2 class="float-left" id="subtitle"></h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
-          <button type="button" class="btn btn-outline-primary btn-lg text-center" id="btn-start">Start</button>
+          <div class="container" id="btn-start-container">
+            <button type="button" class="btn btn-primary btn-lg" id="btn-start" style="display: none">Start</button>
+          </div>
         </div>
       </div>
     </div>`
@@ -212,40 +216,49 @@ generateInitialHtml();
 
 
 // Select elements from created html
-jumbotron = $( '.jumbotron' );
+jumbotron = $( '#jumbo' );
 title = $( '#title' );
 divider = $( '#divider' )
 subtitle = $( '#subtitle' );
 content = $( '#main-content' );
-questionCounterHtml = $( '#question-counter' )
+startButton = $( '#btn-start' );
+questionCounterHtml = $( '#question-counter' );
+
+// Start the game on start button click
+$( document ).on( 'click', '#btn-start', () => {
+  console.log( 'Game Started' )
+  jumbotronAnimate();
+  selectCategoryHtml();
+  startButton.remove();
+} );
 
 // Show categories
 selectCategoryHtml = () => {
   if ( firstGame ) {
     // Animate hide and replace of title text
-    title.fadeOut( 500, function() {
+    title.fadeOut( 500, () => {
       title.text( 'Topnotch Trivia' ).fadeIn( 3000 );
     } );
   }
   firstGame = false;
   // Animate hide and replace of subtitle text
-  subtitle.fadeOut( 200, function() {
+  subtitle.fadeOut( 200, () => {
     subtitle.text( 'Select a Category' ).hide();
   } );
   // Add a tab for our category buttons
-  jumbotron.append( '<div class="tab" style="display: none"></div>' );
-  tab = $( '.tab' );
+  jumbotron.append( '<div class="tab"></div>' );
+  tab = $( '.tab' ).hide();
   
   // Loop for each category, adding a button for each then corresponding tab content"
-  categories.forEach( function( i ) {
+  categories.forEach( ( i ) => {
     // Create buttons
     tab.append( 
       `<button type="button" class="list-group-item btn-category tablinks" value="${ i.value }"   
       id="cat-btn-${i.value}"
-      onmouseover="openCategory( event, '${ i.tabId }' )" 
-      onclick="questionTimer()">
+      onmouseover="openCategory( event, '${ i.tabId }' )">
       ${ i.name }</button></div>`
     )
+    categoryButtonSelector = $( '.btn-category' )
     // Create tab content to show on hover
     jumbotron.append(
       `<div id="${ i.tabId }" class="tabcontent">
@@ -258,53 +271,76 @@ selectCategoryHtml = () => {
   } );
 
   // Get player's chosen category
-  $( '.btn-category' ).on( 'click', function() {
+  categoryButtonSelector.on( 'click', function() {
     chosenValue = this.value;
-    content.append( `<h4 id="question"></h4>` );
-    questionText = $( '#question' );
-    for ( let i = 0; i < categories.length; i++ ) {
-      if ( categories[i].value == chosenValue ) {
-        chosenCategory = categories[i];
-        startGame( chosenCategory );
-      };
-    };
+    getCategory();
+    // Switch subtitle to category name and display question counter
+    subtitle.fadeOut( 0, () => {
+      subtitle.text( chosenCategory.name ).fadeIn( 300 );
+    } );
+    content.append(`<div id="countdown">Get Ready!</div>`);
+    countdownSelector = $( '#countdown' );
+    removeCategories();
+    countdownIntervalId = setInterval( countdown, 1000 )
   } );
 
 };
 
+  
+countdownSeconds = 3;
+countdown = () => {
+  if ( countdownSeconds >= 1 ) {
+    countdownSelector.text( countdownSeconds )
+  } else if ( countdownSeconds === 0 ) {
+    countdownSelector.text( "Go!" )
+  } else if ( countdownSeconds <= -1 ) {
+    countdownSelector.remove();
+    startGame( chosenCategory );
+    questionTimer();
+    clearInterval( countdownIntervalId );
+  }
+  countdownSeconds--;
+}
+
+getCategory = () => {
+  console.log("in chosen category")
+  for ( let i = 0; i < categories.length; i++ ) {
+    if ( categories[i].value == chosenValue ) {
+      chosenCategory = categories[i];
+    };
+  };
+};
+
 startGame = ( category ) => {
   initVars();
+  content.append( `<h4 id="question"></h4>` );
+  questionText = $( '#question' );
   questionCounter = 0;
   questionCounterHtml.text( `Question ${questionCounter + 1}` ).hide();
-  // Switch subtitle to category name and display question counter
-  subtitle.fadeOut( 0, function() {
-    subtitle.text( category.name ).fadeIn( 300 );
-    questionCounterHtml.fadeIn( 300 );
-      } );
+  questionCounterHtml.fadeIn( 300 );
   // Remove all select categories html
   removeCategories();
   // Randomize order of questions
   shuffledQuestions = shuffle( [...category.questions] );
-               
-  displayQuestion( shuffledQuestions );    
+  displayQuestion( shuffledQuestions );  
+    
 }
 
 // Find index of current question and display to screen
-displayQuestion = ( qs ) => {
+displayQuestion = ( q ) => {
   questionCounterHtml.text( `Question ${questionCounter + 1}` ) 
   questionIndex = questionCounter;
-  questionText.text( qs[questionIndex].question );
+  questionText.text( q[questionIndex].question );
   questionCounter++; // Increment question counter so a new question is displayed on every call
-  getChoices( qs );
+  getChoices( q )
 }
 
 // Generates html to display each possible answer in a list
-getChoices = ( q ) => {
-  generateChoiceHtml( q );
-  choice = $( '.choice' )
+getChoices = ( qs ) => {
+  generateChoiceHtml( qs );
   choice.on( 'click', function() {
     guess = $( this ).text().substring( 3 );
-    if ( guess === q[questionIndex].answer) {
+    if ( guess === qs[questionIndex].answer) {
       correctAnswer();
     } else {
       incorrectAnswer();
@@ -321,7 +357,7 @@ questionTimer = () => {
   questionTime = chosenDifficulty * 1000;
   seconds = chosenDifficulty;
   questionIntervalId = setInterval( updateTimerBar, 1000 );
-  questionTimerId = setTimeout( function() {
+  questionTimerId = setTimeout( () => {
     timeUp() 
   }, questionTime )
  startTimerBarSmooth();
@@ -339,6 +375,7 @@ generateChoiceHtml = ( q ) => {
       `<button type="button" class="list-group-item list-group-item-action choice">${listNum}. ${choiceOrder[i]}</button>`
     );
   };
+  choice = $( '.choice' )
   // Create element to display our timer
   generateTimerBar()
  }
@@ -386,7 +423,7 @@ showGif = () => {
 }
 
 setGifTimeout = () => {
-  gifTimeoutId = setTimeout( function() {
+  gifTimeoutId = setTimeout( () => {
     if ( shuffledQuestions.length - 1 === questionIndex ) {
       endRound();
     } else {
@@ -418,6 +455,7 @@ shuffle = ( array ) => {
 
   return array;
 }
+
 
 // Declare and set variables needed for the updateTimerBar function
 let barWidth = 100; // Bar starts at 100%
@@ -487,25 +525,31 @@ removeCategories = () => {
 }
 
 endRound = () => {
+
+  subtitle.text( 'Round Over!' ).fadeIn( 300 );
+  questionText.text( '' );
+
   questionCounterHtml.animate( { 
     opacity: 0
   }, 1000 );
   
   jumbotron.animate( {
-    height: '15vh'
+    height: '20vh'
   }, 3000, () => {
-    delayTwo = setTimeout( function() {
+    setTimeout( () => {
       appendStats();
       jumbotron.animate( {
-        height: '50vh'
+        height: '65vh'
       }, 3000 );
     }, 2000 );
   } );
 
-  subtitle.fadeOut( 0, function() {
-    subtitle.text( 'Let\'s see how you did...' ).fadeIn( 2000 );
-    questionText.text( '' );
-  } );
+  setTimeout( () => {
+    subtitle.fadeOut( 500, () => {
+      subtitle.text( 'Let\'s see how you did...' ).fadeIn( 2000 );
+    } );
+  }, 3000 );
+  
 };
 
 appendStats = () => {
@@ -514,51 +558,42 @@ appendStats = () => {
   totalUnanswered += unanswered;
   content.append( `
     <div class="float-left" id="stats-round">
-      <h1><u>This Round</u></h1>
+      <h1 class="display-4"><u>This Round</u></h1>
       <h4>Correct: <b>${correctAnswers}</b></h4>
       <h4>Inorrect: <b>${incorrectAnswers}</b></h4>
       <h4>Unanswered: <b>${unanswered}</b></h4>
     </div>
     <div class="float-right" id="stats-overall">
-      <h1><u>Overall</u></h1>
+      <h1 class="display-4"><u>Overall</u></h1>
       <h4>Correct: <b>${totalCorrectAnswers}</b></h4>
       <h4>Inorrect: <b>${totalIncorrectAnswers}</b></h4>
       <h4>Unanswered: <b>${totalUnanswered}</b></h4>
     </div>
     <div class="clearfix"></div>
-  ` ).hide().fadeIn( 1000 ) 
-  clearTimeout( delayTwo );
+  ` ).hide().fadeIn( 2000 ) 
 };
 
 // Some fun animations
 jumbotronAnimate = () => {
+  divider.fadeIn( 2000 );
   jumbotron.animate( {
-    backgroundColor: "#e9ecef",
-  }, 3000, () => {
-    divider.fadeIn( 2000 );
-    jumbotron.animate( {
-      height: '65vh'
-    }, 2000, () => {
-      subtitle.fadeIn( 1000 )
-      tab.show( 'slow' )
-    } );
-   } )
-   title.animate( {
-    color: "#000"
-  }, 3000 );
- 
+    height: '65vh'
+  }, 2000, () => {
+    subtitle.fadeIn( 1000 )
+    tab.show()
+  } ); 
 } 
  
 titleAnimate = () => {
-  title.fadeIn( 500 );
+  title.fadeIn( 1000 );
+  jumbotron.animate( {
+    backgroundColor: "#e9ecef",
+  }, 3000 ) 
+  title.animate( {
+    color: "#000"
+  }, 3000, () => {
+    startButton.fadeIn( 500 )
+  } );
 }
 
 titleAnimate();
-
-// Start the game on start button click
-$( document ).on( 'click', '#btn-start', function() {
-  console.log( 'Game Started' )
-  jumbotronAnimate();
-  selectCategoryHtml();
-  this.remove();
-} );

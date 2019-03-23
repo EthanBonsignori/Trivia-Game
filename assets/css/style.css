@@ -32,10 +32,17 @@ body {
 }
 
 #btn-start {
-  width: 40%;
-  height: 100px;
+  width: 20%;
   margin-top: 2rem;
-  background-color: #fff;
+}
+
+#btn-start-container {
+  text-align: center;
+}
+
+#countdown {
+  text-align: center; 
+  font-size: 3rem;
 }
 
 /*-- Category tabs --*/
