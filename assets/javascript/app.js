@@ -8,20 +8,21 @@
 // Declaring variables
 let
 // Html elements
-title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, questionText, chosenCategory, choice, timerBar,
+title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, gifTimeoutId, firstGame, countdownSeconds, totalRounds,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, gifTime,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
-countdownIntervalId, questionIntervalId, questionTimerId, smoothInterval, gidTimeoutId, 
+countdownIntervalId, questionIntervalId, questionTimerId, smoothInterval, gifTimeoutId, 
 // Difficulties (seconds)
 difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 
 totalCorrectAnswers = 0;
 totalIncorrectAnswers = 0;
-totalUnanswered = 0;8
+totalUnanswered = 0;
 totalRounds = 1;
+gifTime = 6;
 firstGame = true;
 
 // May add chosen difficulty later
@@ -417,10 +418,12 @@ timeUp = () => {
 }
 
 showGif = () => {
+  gifTime = 6;
   content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[questionIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` );
   gifDiv = $( '#gif' );
   clearTimeout( gifTimeoutId )
   setGifTimeout();
+  showGifTime();
 }
 
 setGifTimeout = () => {
@@ -432,10 +435,23 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, 6000 );
+  }, gifTime * 1000 );
 };
 
-
+showGifTime = () => {
+  gifDiv.append( `<div id="gif-timer-container"></div>` )
+  gifTimerContainer = $( '#gif-timer-container' )
+  for ( let n = 0; n < gifTime; n++ ) {
+    gifTimerContainer.append( `<div class="gif-timer-bar" id="gif-timer-${n}"><div>` )
+  }  
+  gifInterval = setInterval( removeLastGifTimeDiv, 1000 )
+}
+let gifTimerId = 6;
+removeLastGifTimeDiv = () => {
+  console.log(gifTimerId)
+  // (`${gifTimerContainer}:nth-child(${gifTimerId}`).remove();
+  gifTimerId--;
+}
 
 // Randomize the order of input array so questions/choices appear in a different order on each game
 // Fisher-Yates Shuffle
@@ -461,9 +477,10 @@ shuffle = ( array ) => {
 // Declare and set variables needed for the updateTimerBar function
 let barWidth = 100; // Bar starts at 100%
 let seconds = chosenDifficulty; // Same value, different name (so it makes more sense in context)
-let fullPercent = ( barWidth / seconds ); // Get full number to subtract bar width by each interval
-let smoothPercent = ( ( fullPercent / 100 ) * 17 ); // Get 17% of that number so we can run it 17 times to smooth it out
-let subtractWidth = ( Math.floor( smoothPercent * 100 ) / 100 );  // Remove the unesecary decimal places so we have a clean number
+// let fullPercent = ( barWidth / seconds ); // Get full number to subtract bar width by each interval
+// let smoothPercent = ( ( fullPercent / 100 ) * 17 ); // Get 17% of that number so we can run it 17 times to smooth it out
+// let subtractWidth = ( Math.floor( smoothPercent * 100 ) / 100 );  // Remove the unesecary decimal places so we have a clean number
+
 // Update a bootstrap timerbar so that it's width equals the percentage of time remaining every second
 updateTimerBar = () => {
   timerBar = $( '#timer-bar' );
