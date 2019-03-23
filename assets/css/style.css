@@ -31,13 +31,21 @@ body {
   display: none;
 }
 
-#btn-start {
-  width: 20%;
-  margin-top: 2rem;
+#btn-container {
+  position: absolute;
+  bottom: 4rem;
+  left: 0;
+  text-align: center;
 }
 
-#btn-start-container {
-  text-align: center;
+#btn-start {
+  display: none;
+  width: 20%;
+}
+
+#btn-restart {
+  width: 20%;
+  bottom: 6rem;
 }
 
 #countdown {

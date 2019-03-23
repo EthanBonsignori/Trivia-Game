@@ -8,9 +8,9 @@
 // Declaring variables
 let
 // Html elements
-title, divider, subtitle, content, startButton, tab, categoryButtonSelector, gifDiv, questionText, chosenCategory, choice, timerBar,
+title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, gifTimeoutId, firstGame, countdownSeconds,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, gifTimeoutId, firstGame, countdownSeconds, totalRounds,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
@@ -20,7 +20,8 @@ difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 
 totalCorrectAnswers = 0;
 totalIncorrectAnswers = 0;
-totalUnanswered = 0;
+totalUnanswered = 0;8
+totalRounds = 1;
 firstGame = true;
 
 // May add chosen difficulty later
@@ -188,7 +189,7 @@ initVars = () => {
   correctAnswers = 0;
   incorrectAnswers = 0;
   unanswered = 0;
-  countdownSeconds = 3;
+  countdownSeconds = 4;
   questionTime = chosenDifficulty * 1000;
 }
 
@@ -202,8 +203,8 @@ generateInitialHtml = () => {
           <h2 class="float-left" id="subtitle"></h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
-          <div class="container" id="btn-start-container">
-            <button type="button" class="btn btn-primary btn-lg" id="btn-start" style="display: none">Start</button>
+          <div class="container" id="btn-container">
+            <button type="button" class="btn btn-primary btn-lg" id="btn-start">Start</button>
           </div>
         </div>
       </div>
@@ -226,14 +227,14 @@ questionCounterHtml = $( '#question-counter' );
 
 // Start the game on start button click
 $( document ).on( 'click', '#btn-start', () => {
-  console.log( 'Game Started' )
+  console.log( '----- Game Started -----' )
   jumbotronAnimate();
-  selectCategoryHtml();
+  generateCategoryHtml();
   startButton.remove();
 } );
 
-// Show categories
-selectCategoryHtml = () => {
+// Create the html that displays our category selection, hide it until jumbotron animation is complete
+generateCategoryHtml = () => {
   if ( firstGame ) {
     // Animate hide and replace of title text
     title.fadeOut( 500, () => {
@@ -265,7 +266,7 @@ selectCategoryHtml = () => {
       <h4><u><b>${ i.name }</b></u></h4>
       <h5><b>Difficulty: </b>${ i.difficulty }</h5> 
       <h5><b>Questions: </b>${ i.length }</h5> 
-      <h5><b>Description: </b>${ i.description }</h5>
+      <h5>${ i.description }</h5>
       </div>`
     )
   } );
@@ -276,7 +277,7 @@ selectCategoryHtml = () => {
     getCategory();
     // Switch subtitle to category name and display question counter
     subtitle.fadeOut( 0, () => {
-      subtitle.text( chosenCategory.name ).fadeIn( 300 );
+      subtitle.text( chosenCategory.name ).show();
     } );
     content.append(`<div id="countdown">Get Ready!</div>`);
     countdownSelector = $( '#countdown' );
@@ -303,12 +304,12 @@ countdown = () => {
 }
 
 getCategory = () => {
-  console.log("in chosen category")
   for ( let i = 0; i < categories.length; i++ ) {
     if ( categories[i].value == chosenValue ) {
       chosenCategory = categories[i];
     };
   };
+  console.log( `Chosen Category ---- ${chosenCategory.name}` )
 };
 
 startGame = ( category ) => {
@@ -392,7 +393,7 @@ generateTimerBar = () => {
 // Run on correct player guess
 correctAnswer = () => {
   correctAnswers++;
-  console.log( `Correct answer. Total: ${correctAnswers}` )
+  console.log( `Correct Answer ----- This round: ${correctAnswers}` )
   questionText.html( `Correct!` )
 }
 
@@ -400,7 +401,7 @@ correctAnswer = () => {
 incorrectAnswer = () => {
   incorrectAnswers++;
   questionText.html( `Incorrect! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
-  console.log( `Incorrect answer. Total: ${incorrectAnswers}`)
+  console.log( `Incorrect answer --- This round: ${incorrectAnswers}` )
 }
 
 // Run when question timer runs out
@@ -410,9 +411,9 @@ timeUp = () => {
   clearInterval(smoothInterval);
   showGif();
   unanswered++;
-  console.log("Time's up")
   $( '.list-group' ).remove();
   questionText.html( `You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
+  console.log( `Ran out of time ---- This round: ${unanswered}` )
 }
 
 showGif = () => {
@@ -431,7 +432,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, 6000 );
+  }, 60 );
 };
 
 
@@ -525,7 +526,6 @@ removeCategories = () => {
 }
 
 endRound = () => {
-
   subtitle.text( 'Round Over!' ).fadeIn( 300 );
   questionText.text( '' );
 
@@ -540,13 +540,13 @@ endRound = () => {
       appendStats();
       jumbotron.animate( {
         height: '65vh'
-      }, 3000 );
-    }, 2000 );
+      }, 2000 );
+    }, 1500 );
   } );
 
   setTimeout( () => {
     subtitle.fadeOut( 500, () => {
-      subtitle.text( 'Let\'s see how you did...' ).fadeIn( 2000 );
+      subtitle.text( `Let's see how you did...` ).fadeIn( 2000 );
     } );
   }, 3000 );
   
@@ -558,20 +558,34 @@ appendStats = () => {
   totalUnanswered += unanswered;
   content.append( `
     <div class="float-left" id="stats-round">
-      <h1 class="display-4"><u>This Round</u></h1>
+      <h1 class="display-4">This Round</h1>
       <h4>Correct: <b>${correctAnswers}</b></h4>
       <h4>Inorrect: <b>${incorrectAnswers}</b></h4>
       <h4>Unanswered: <b>${unanswered}</b></h4>
     </div>
     <div class="float-right" id="stats-overall">
-      <h1 class="display-4"><u>Overall</u></h1>
+      <h1 class="display-4">Overall (${totalRounds})</h1>
       <h4>Correct: <b>${totalCorrectAnswers}</b></h4>
       <h4>Inorrect: <b>${totalIncorrectAnswers}</b></h4>
       <h4>Unanswered: <b>${totalUnanswered}</b></h4>
     </div>
-    <div class="clearfix"></div>
-  ` ).hide().fadeIn( 2000 ) 
+    <div class="clearfix"></div>` )
+    .hide()
+    .fadeIn( 1000 );
+  content.append(` 
+    <div class="container" id="btn-container">
+      <button type="button" class="btn btn-primary btn-lg" id="btn-restart">Play Again</button>
+    </div> 
+  `).hide().fadeIn( 3000 );
 };
+
+$( document ).on( 'click', '#btn-restart', () => {
+  totalRounds++;
+  content.empty();
+  restartAnimate();
+  generateCategoryHtml();
+  jumbotronAnimate();
+} )
 
 // Some fun animations
 jumbotronAnimate = () => {
@@ -582,7 +596,7 @@ jumbotronAnimate = () => {
     subtitle.fadeIn( 1000 )
     tab.show()
   } ); 
-} 
+}
  
 titleAnimate = () => {
   title.fadeIn( 1000 );
@@ -595,5 +609,14 @@ titleAnimate = () => {
     startButton.fadeIn( 500 )
   } );
 }
+
+restartAnimate = () => {
+  jumbotron.animate( { backgroundColor: "#007bff" }, 1500, () => 
+    { jumbotron.animate( { backgroundColor: "#e9ecef" }, 1500 ) } 
+  );
+  title.animate( { color: '#ffffff' }, 1500, () => 
+    { title.animate( { color: '#000' }, 1500 ) } 
+  );
+};
 
 titleAnimate();
