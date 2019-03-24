@@ -22,11 +22,13 @@ countdownIntervalId, questionIntervalId, questionTimerId, smoothInterval, gifTim
 // Difficulties (seconds)
 difficultyEasy, difficultyMedium, difficultyHard, chosenDifficulty;
 
-totalCorrectAnswers = 0;
+totalCorrectAnswers = 0;  
 totalIncorrectAnswers = 0;
 totalUnanswered = 0;
-totalRounds = 1;
+
 scoreTextIndex = 0;
+totalRounds = 1;
+countdownSeconds = 3;
 gifTime = 6;
 gifOption = 1000;
 gifOptionStatus = true;
@@ -239,7 +241,7 @@ questionCounterHtml = $( '#question-counter' );
 
 // Start the game on start button click
 $( document ).on( 'click', '#btn-start', () => {
-  console.log( '----- Game Started -----' )
+  console.log( '------ Game Started ------' )
   jumbotronAnimate();
   generateCategoryHtml();
   startButton.remove();
@@ -314,17 +316,17 @@ generateCategoryHtml = () => {
 
 };
 
+// Enables tooltips on info button and gif display toggle button
 getTooltips = () => {
   $('[data-toggle="tooltip"]').tooltip()
 }
-  
-countdownSeconds = 3;
+
+// Starts a countdown before each round
 countdown = () => {
   countdownSelector.addClass( 'countdownFont' ) 
   if ( countdownSeconds >= 1 ) {
     countdownSelector.text( countdownSeconds )
   } else if ( countdownSeconds === 0 ) {
-    countdownSelector.removeClass( 'countdownFont' )
     countdownSelector.text( "GO!" )
   } else if ( countdownSeconds <= -1 ) {
     countdownSelector.remove();
@@ -374,7 +376,7 @@ displayQuestion = ( q ) => {
   getChoices( q )
 }
 
-// Generates html to display each possible answer in a list
+// Calls the function that generates the choice html and then listens for clicks on those choices
 getChoices = ( qs ) => {
   generateChoiceHtml( qs );
   choice.on( 'click', function() {
@@ -388,11 +390,11 @@ getChoices = ( qs ) => {
     clearInterval( questionIntervalId );
     clearTimeout( questionTimerId );
     clearInterval( smoothInterval );
-    // Check game state and if gifs are enabled or disabled
     checkGifStatus();
   } );
 };
 
+// Check game state and if gifs are enabled or disabled
 checkGifStatus = () => {
   // If the at the end of the questions array for this round and gifs are enabled
   if ( shuffledQuestions.length - 1 == questionIndex && gifOptionStatus ) {
@@ -412,6 +414,7 @@ checkGifStatus = () => {
   }
 }
 
+// Clears necessary intervals and timeouts
 clearThings = () => {
   clearTimeout( gifTimeoutId )
   clearInterval( questionIntervalId );
@@ -419,16 +422,48 @@ clearThings = () => {
   clearInterval( smoothInterval );
 }
 
+// Start the timer for each new question and update the timer bar
 questionTimer = () => {
   questionTime = chosenDifficulty * 1000;
   seconds = chosenDifficulty;
-  questionIntervalId = setInterval( updateTimerBar, 1000 );
+  questionIntervalId = setInterval( updateTimerBarText, 1000 );
   questionTimerId = setTimeout( () => {
     timeUp() 
   }, questionTime )
- startTimerBarSmooth();
+ updateTimerBarWidth();
 }
 
+// Update the timer bar text and color
+updateTimerBarText = () => {
+  timerBar = $( '#timer-bar' );
+  // Update text of timer bar
+  remainingTime = seconds-- -1;
+  let remainingTimeSelector = $( '#time-remaining' );
+  if ( remainingTime > 1 ) {
+    remainingTimeSelector.text( `${remainingTime} seconds` );
+  } else {
+    remainingTimeSelector.text( `${remainingTime} second` );
+  };
+
+  // Animate bar color at 8 and 3 seconds
+  if ( remainingTime === 8 ) {
+    timerBar.addClass( 'yellow' )
+  } else if ( remainingTime === 3 ) {
+    timerBar.addClass( 'red' )
+  };
+};
+
+// Interval every 50ms to smoothly move the width of the bar down instead of chunks every 1s
+updateTimerBarWidth = () => { 
+  barWidth = 100;
+  smoothInterval = setInterval( () => {
+    timerBar = $( '#timer-bar' );
+    barWidth -= 0.25;
+    timerBar.css( 'width', `${barWidth}%` )
+  }, 50 )
+}
+
+// Create list html that displays choices
 generateChoiceHtml = ( q ) => {
   // Randomize order of choices and store in array 
   let choiceOrder = shuffle( [...q[questionIndex].choices] );
@@ -451,6 +486,7 @@ generateChoiceHtml = ( q ) => {
   generateTimerBar()
  }
 
+ // Create html for progress bar
 generateTimerBar = () => {
   $( '.list-group' ).append( 
     `<div class="progress">
@@ -460,21 +496,21 @@ generateTimerBar = () => {
   </div>` )
 };
 
-// Run on correct player guess
+// Called on correct player guess
 correctAnswer = () => {
   correctAnswers++;
   console.log( `Correct Answer ----- This round: ${correctAnswers}` )
   questionText.html( `<i class="fas fa-check"></i> Correct!` )
 }
 
-// Run on incorrect player guess
+// Called on incorrect player guess
 incorrectAnswer = () => {
   incorrectAnswers++;
   questionText.html( `<i class="fas fa-times"></i> Incorrect! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Incorrect answer --- This round: ${incorrectAnswers}` )
 }
 
-// Run when question timer runs out
+// Called when question timer runs out
 timeUp = () => {
   clearInterval( questionIntervalId );
   clearTimeout( questionTimerId );
@@ -486,6 +522,7 @@ timeUp = () => {
   console.log( `Ran out of time ---- This round: ${unanswered}` )
 }
 
+// Called when gifOptionStatus = true
 showGif = () => {
   gifTime = 6;
   gifTimeDivId = gifTime - 1;
@@ -496,6 +533,7 @@ showGif = () => {
   showGifTime();
 }
 
+// Timeout for gif display, show next question when complete
 setGifTimeout = () => {
   gifTimeoutId = setTimeout( () => {
     if ( shuffledQuestions.length - 1 === questionIndex ) {
@@ -508,6 +546,7 @@ setGifTimeout = () => {
   }, gifTime * gifOption );
 };
 
+// Visual display of seconds remaining before next question while gif is shown
 showGifTime = () => {
   gifDiv.append( `<div id="gif-timer-container"></div>` )
   gifTimerContainer = $( '#gif-timer-container' )
@@ -518,7 +557,7 @@ showGifTime = () => {
   gifInterval = setInterval( removeLastGifTimeDiv, 925 )
 }
 
-
+// Removes the last timer bar for the gif time display every interval
 removeLastGifTimeDiv = () => {
   let gifTimeDiv = $( `#gif-timer-${gifTimeDivId}` )
   gifTimeDiv.fadeOut( 300, () => {
@@ -556,38 +595,6 @@ shuffle = ( array ) => {
 let barWidth = 100; // Bar starts at 100%
 let seconds = chosenDifficulty; // Same value, different name (so it makes more sense in context)
 
-// Update a bootstrap timerbar so that it's width equals the percentage of time remaining every second
-updateTimerBar = () => {
-  timerBar = $( '#timer-bar' );
-
-  // Update text of timer bar
-  remainingTime = seconds-- -1;
-  let remainingTimeSelector = $( '#time-remaining' );
-  if ( remainingTime > 1 ) {
-    remainingTimeSelector.text( `${remainingTime} seconds` );
-  } else {
-    remainingTimeSelector.text( `${remainingTime} second` );
-  };
-
-  // Animate bar color
-  if ( remainingTime === 8 ) {
-    timerBar.addClass( 'yellow' )
-  } else if ( remainingTime === 3 ) {
-    timerBar.addClass( 'red' )
-  };
-};
-
-startTimerBarSmooth = () => { 
-  smoothInterval = setInterval( smoothSubtract, 50 )
-  barWidth = 100;
-}
-
-smoothSubtract = () => {
-  timerBar = $( '#timer-bar' );
-  barWidth -= 0.25;
-  timerBar.css( 'width', `${barWidth}%` )
-}
-
 // Tabs for categories on mouseover
 openCategory = ( event, categoryName ) => {
   // Declare all variables
@@ -616,6 +623,7 @@ removeCategories = () => {
   $( '.tabcontent' ).remove();
 }
 
+// Called when last question is over, does some animations
 endRound = () => {
   subtitle.text( 'Round Over!' ).fadeIn( 300 );
   questionText.text( '' );
@@ -628,14 +636,14 @@ endRound = () => {
     height: '25vh'
   }, 2000, () => {
     setTimeout( () => {
-      appendStats();
+      generateStatsHtml();
       jumbotron.animate( {
         height: '65vh'
       }, 2000 );
     }, 1500 );
   } );
 
-
+  // Hmmmmmmm
   setTimeout( () => {
     if ( scoreTextIndex === scoreTextLength - 1 ) {
       playerIsInsane = true;
@@ -660,15 +668,17 @@ endRound = () => {
 
 let scoreText = [
   "Let's see how you did...",
-  "Calculating your scores...",
+  "Round 2 scores coming right up!",
   "Great moves! Keep it up!",
   "Wow, you've played a lot of rounds!",
-  "Okay, seriously, there's not that much content in this game.",
+  "Honestly this is too many rounds to keep track of.",
+  "Seriously there's not that much content in this game.",
   "IT'S TIME TO STOP!",
   "Okay fine, keep playing... See if I care..." ]
 let scoreTextLength = scoreText.length;
 
-appendStats = () => {
+// Creates html to display stats for this round and overall
+generateStatsHtml = () => {
   totalCorrectAnswers += correctAnswers;
   totalIncorrectAnswers += incorrectAnswers;
   totalUnanswered += unanswered;
@@ -695,6 +705,7 @@ appendStats = () => {
   `).hide().fadeIn( 2000 );
 };
 
+// Listen for clicks on restart button, restart game on click
 $( document ).on( 'click', '#btn-restart', () => {
   totalRounds++;
   content.empty();
@@ -706,6 +717,8 @@ $( document ).on( 'click', '#btn-restart', () => {
   }, 2500 );
 } );
 
+
+// Listen for clicks on the gif option
 $( document ).on( 'click', '#option-cog', function() {
   if ( gifOptionStatus ) {
     optionCog.toggleClass( 'fa-video fa-video-slash' )
@@ -720,6 +733,7 @@ $( document ).on( 'click', '#option-cog', function() {
   };
 } );
 
+// Run once at start to create html for the window that pops up when you press on the info button
 appendModal = () => {
 $( 'body' ).append(`
   <div class="modal fade" id="infoModal" tabindex="10" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
