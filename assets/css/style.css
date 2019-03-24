@@ -48,11 +48,11 @@ body {
 
 #option-cog {
   color: rgba(73, 73, 73, 0.5);
-  font-size: 1rem;
+  font-size: 1.5rem;
   float: right;
   position: absolute;
-  right: 0.4rem;
-  bottom: 0.4rem;
+  right: 0.5rem;
+  bottom: 0.5rem;
   -webkit-appearance: none;
   background: none;
   border: none;

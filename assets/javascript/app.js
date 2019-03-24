@@ -248,18 +248,22 @@ generateCategoryHtml = () => {
     // Animate hide and replace of title text
     title.fadeOut( 500, () => {
       title.text( 'Topnotch Trivia' ).fadeIn( 3000 );
-      title.append(` <button type="button" id="title-icon" data-toggle="modal" data-target="#infoModal"><i class="fas fa-info-circle"></i></button>`)
+      title.append(`
+        <button type="button" id="title-icon" 
+        data-toggle="modal" data-target="#infoModal">
+          <i class="fas fa-info-circle"
+          data-toggle="tooltip" data-placement="top" title="Info"></i>
+        </button>`)
       jumbotron.append(`
-      <button type="button" id="option-cog"
-      data-toggle="tooltip" data-placement="top" title="Toggle gif display after question">
-        <i id="option-cog-icon" class="fas fa-video"></i>
-      </button>`)
+        <button type="button" id="option-cog"
+        data-toggle="tooltip" data-placement="top" title="Toggle gif display">
+          <i id="option-cog-icon" class="fas fa-video"></i>
+        </button>`)
       .fadeIn( 2000 )
       optionCog = $( '#option-cog-icon' )
       getTooltips();
     } );
   }
-  firstGame = false;
   // Animate hide and replace of subtitle text
   subtitle.fadeOut( 200, () => {
     subtitle.text( 'Select a Category' ).hide();
@@ -354,7 +358,12 @@ startGame = ( category ) => {
 
 // Find index of current question and display to screen
 displayQuestion = ( q ) => {
-  questionCounterHtml.text( `Question ${questionCounter + 1}` ) 
+  questionCounterHtml.text( `Question ${questionCounter + 1}` );
+  if ( !firstGame ) {
+    questionCounterHtml.animate( { 
+      opacity: 1
+    }, 100 );
+  }
   questionIndex = questionCounter;
   questionText.text( q[questionIndex].question );
   questionCounter++; // Increment question counter so a new question is displayed on every call
@@ -366,19 +375,34 @@ getChoices = ( qs ) => {
   generateChoiceHtml( qs );
   choice.on( 'click', function() {
     guess = $( this ).attr('data-value');
-    console.log("guess " + guess )
     if ( guess === qs[questionIndex].answer) {
       correctAnswer();
     } else {
       incorrectAnswer();
     }
     $( '.list-group' ).remove();
-    showGif();
     clearInterval( questionIntervalId );
     clearTimeout( questionTimerId );
     clearInterval( smoothInterval );
+    if ( shuffledQuestions.length - 1 == questionIndex ) {
+      clearThings();
+      endRound();
+    } else if ( gifOptionStatus ) {
+      showGif();
+    } else {
+      clearThings();
+      displayQuestion( shuffledQuestions );
+      questionTimer();
+    }
   } );
 };
+
+clearThings = () => {
+  clearTimeout( gifTimeoutId )
+  clearInterval( questionIntervalId );
+  clearTimeout( questionTimerId );
+  clearInterval( smoothInterval );
+}
 
 questionTimer = () => {
   questionTime = chosenDifficulty * 1000;
@@ -437,9 +461,9 @@ incorrectAnswer = () => {
 
 // Run when question timer runs out
 timeUp = () => {
-  clearInterval(questionIntervalId);
-  clearTimeout(questionTimerId);
-  clearInterval(smoothInterval);
+  clearInterval( questionIntervalId );
+  clearTimeout( questionTimerId );
+  clearInterval( smoothInterval );
   showGif();
   unanswered++;
   $( '.list-group' ).remove();
@@ -675,12 +699,12 @@ $( document ).on( 'click', '#option-cog', function() {
     optionCog.toggleClass( 'fa-video fa-video-slash' )
     gifOptionStatus = false;
     gifOption = 1;
-    console.log("gif option status " + gifOptionStatus)
+    console.log( "Show gifs= " + gifOptionStatus)
   } else {
     optionCog.toggleClass( 'fa-video-slash fa-video' )
     gifOptionStatus = true;
     gifOption = 1000;
-    console.log("gif option status " + gifOptionStatus)
+    console.log( "Show gifs= " + gifOptionStatus)
   };
 } );
 
@@ -731,6 +755,7 @@ titleAnimate = () => {
 }
 
 restartAnimate = () => {
+  firstGame = false;
   jumbotron.animate( { backgroundColor: jumboFadeColor }, 2000, () => 
     { jumbotron.animate( { backgroundColor: "#e9ecef" }, 2000 ) } 
   );
