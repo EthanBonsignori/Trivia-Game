@@ -55,10 +55,6 @@ body {
   width: 20%;
 }
 
-.fa-caret-right {
-  font-size: 2rem;
-}
-
 #btn-restart {
   width: 20%;
   bottom: 6rem;
@@ -174,10 +170,6 @@ body {
   width: 300px;
 }
 
-#gif-timer-container {
-  /* text-align: center; */
-}
-
 .gif-timer-bar {
   display: inline-block;
   margin-left: 0.5rem;
@@ -185,6 +177,8 @@ body {
   width: 2rem;
   height: 1rem;
   background-color: #007bff;
+  border-radius: 3px;
+  border: 1px solid black;
 }
 
 iframe {

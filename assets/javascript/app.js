@@ -447,7 +447,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, gifTime * 1000 );
+  }, gifTime * 106600 );
 };
 
 showGifTime = () => {
@@ -457,16 +457,17 @@ showGifTime = () => {
     gifTimerContainer.append( `<div class="gif-timer-bar" id="gif-timer-${n}"><div>` )
   } 
   gifTimerBar = $( '.gif-timer-bar' )
-  gifInterval = setInterval( removeLastGifTimeDiv, 1000 )
+  gifInterval = setInterval( removeLastGifTimeDiv, 925 )
 }
 
 
 removeLastGifTimeDiv = () => {
-  console.log("Gif time div id to remove: " + gifTimeDivId)
-  $( `#gif-timer-${gifTimeDivId}` ).remove();
+  let gifTimeDiv = $( `#gif-timer-${gifTimeDivId}` )
+  gifTimeDiv.fadeOut( 300, () => {
+    gifTimeDiv.remove();
+  } );
   gifTimeDivId--;
   if (gifTimeDivId === -1) {
-    console.log("clearing gif remove interval")
     clearInterval(gifInterval);
   }
   
@@ -570,7 +571,7 @@ endRound = () => {
   }, 1000 );
   
   jumbotron.animate( {
-    height: '20vh'
+    height: '25vh'
   }, 2000, () => {
     setTimeout( () => {
       appendStats();
