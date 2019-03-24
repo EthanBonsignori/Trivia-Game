@@ -1,3 +1,6 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css?family=Finger+Paint');
+
 body {
   height: 100vh;
   background-image: 
@@ -45,6 +48,7 @@ body {
 
 #btn-container {
   position: absolute;
+  min-width: 100%;
   bottom: 1rem;
   left: 0;
   text-align: center;
@@ -61,9 +65,14 @@ body {
 }
 
 #countdown {
+  vertical-align: center;
   text-align: center; 
   font-size: 5rem;
-  margin-top: 15%;
+}
+
+.countdownFont {
+  font-family: 'Finger Paint', cursive;
+  font-size: 8rem !important;
 }
 
 /*-- Category tabs --*/
@@ -160,7 +169,7 @@ body {
 }
 
 .fa-clock {
-  color: rgb(255, 255, 0);
+  color: rgb(225, 100, 0);
 }
 
 /*-- Gifs --*/

@@ -296,9 +296,11 @@ generateCategoryHtml = () => {
   
 countdownSeconds = 3;
 countdown = () => {
+  countdownSelector.addClass( 'countdownFont' ) 
   if ( countdownSeconds >= 1 ) {
     countdownSelector.text( countdownSeconds )
   } else if ( countdownSeconds === 0 ) {
+    countdownSelector.removeClass( 'countdownFont' )
     countdownSelector.text( "Go!" )
   } else if ( countdownSeconds <= -1 ) {
     countdownSelector.remove();
