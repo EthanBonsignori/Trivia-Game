@@ -8,9 +8,9 @@
 // Declaring variables
 let
 // Html elements
-title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, gifTimerBar, questionText, chosenCategory, choice, timerBar,
+title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, gifTimerBar, questionText, chosenCategory, choice, timerBar, optionCog,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, playerIsInsane, gifTime, gifTimeDivId, scoreTextIndex, jumboFadeColor, titleFadeColor,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, playerIsInsane, gifTime, gifOption, gifOptionStatus, gifTimeDivId, scoreTextIndex, jumboFadeColor, titleFadeColor,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
@@ -24,6 +24,8 @@ totalUnanswered = 0;
 totalRounds = 1;
 scoreTextIndex = 0;
 gifTime = 6;
+gifOption = 1000;
+gifOptionStatus = true;
 firstGame = true;
 jumboFadeColor = '#007bff';
 titleFadeColor = '#ffffff';
@@ -247,6 +249,14 @@ generateCategoryHtml = () => {
     title.fadeOut( 500, () => {
       title.text( 'Topnotch Trivia' ).fadeIn( 3000 );
       title.append(` <button type="button" id="title-icon" data-toggle="modal" data-target="#infoModal"><i class="fas fa-info-circle"></i></button>`)
+      jumbotron.append(`
+      <button type="button" id="option-cog"
+      data-toggle="tooltip" data-placement="top" title="Toggle gif display after question">
+        <i id="option-cog-icon" class="fas fa-video"></i>
+      </button>`)
+      .fadeIn( 2000 )
+      optionCog = $( '#option-cog-icon' )
+      getTooltips();
     } );
   }
   firstGame = false;
@@ -296,6 +306,9 @@ generateCategoryHtml = () => {
 
 };
 
+getTooltips = () => {
+  $('[data-toggle="tooltip"]').tooltip()
+}
   
 countdownSeconds = 3;
 countdown = () => {
@@ -453,7 +466,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, gifTime * 1000 );
+  }, gifTime * gifOption );
 };
 
 showGifTime = () => {
@@ -612,10 +625,8 @@ endRound = () => {
 
 let scoreText = [
   "Let's see how you did...",
-  "Calculating scores...", 
   "Great moves! Keep it up!",
   "Wow, you've played a lot of rounds!",
-  "I'll grab the stats but you should think about taking a break.",
   "Okay, seriously there's not THAT much content in this game.",
   "IT'S TIME TO STOP!",
   "Okay fine, keep playing... See if I care..." ]
@@ -657,6 +668,20 @@ $( document ).on( 'click', '#btn-restart', () => {
     subtitle.fadeIn( 1000 )
     tab.show( )
   }, 2500 );
+} );
+
+$( document ).on( 'click', '#option-cog', function() {
+  if ( gifOptionStatus ) {
+    optionCog.toggleClass( 'fa-video fa-video-slash' )
+    gifOptionStatus = false;
+    gifOption = 1;
+    console.log("gif option status " + gifOptionStatus)
+  } else {
+    optionCog.toggleClass( 'fa-video-slash fa-video' )
+    gifOptionStatus = true;
+    gifOption = 1000;
+    console.log("gif option status " + gifOptionStatus)
+  };
 } );
 
 appendModal = () => {
