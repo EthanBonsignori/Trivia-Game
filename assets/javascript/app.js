@@ -10,7 +10,7 @@ let
 // Html elements
 title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, gifTimerBar, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, gifTime, gifTimeDivId,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, playerIsInsane, gifTime, gifTimeDivId, scoreTextIndex, jumboFadeColor, titleFadeColor,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
@@ -22,8 +22,11 @@ totalCorrectAnswers = 0;
 totalIncorrectAnswers = 0;
 totalUnanswered = 0;
 totalRounds = 1;
+scoreTextIndex = 0;
 gifTime = 6;
 firstGame = true;
+jumboFadeColor = '#007bff';
+titleFadeColor = '#ffffff';
 
 // May add chosen difficulty later
 difficultyEasy = 30;
@@ -450,7 +453,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, gifTime * 1000 );
+  }, 10 );
 };
 
 showGifTime = () => {
@@ -584,13 +587,39 @@ endRound = () => {
     }, 1500 );
   } );
 
+
   setTimeout( () => {
+    if ( scoreTextIndex === scoreTextLength - 1 ) {
+      playerIsInsane = true;
+      console.log( "Is this player insane?!?" + playerIsInsane)
+      jumboFadeColor = "#ff0000"
+      titleFadeColor = "#8c00ff"
+      title.fadeOut( 10000, () => {
+        title.text("Bottomnotch Trivia").fadeIn( 1000 );
+      } );
+    };
+    if ( playerIsInsane ) {
+      let insaneTextForInsanePlayer = Math.random().toString( 36 ).substring( 2, 15 ) + Math.random().toString( 36 ).substring( 2, 15 );
+      scoreText.push( insaneTextForInsanePlayer );
+    }
     subtitle.fadeOut( 500, () => {
-      subtitle.text( `Let's see how you did...` ).fadeIn( 2000 );
+      subtitle.text( scoreText[scoreTextIndex] ).fadeIn( 2000 );
+      scoreTextIndex++;
     } );
   }, 2300 );
   
 };
+
+let scoreText = [
+  // "Let's see how you did...",
+  // "Calculating scores...", 
+  // "Great moves! Keep it up!",
+  // "Wow, you've played a lot of rounds!",
+  // "I'll grab the stats but you should think about taking a break.",
+  // "Okay, seriously there's not THAT much content in this game.",
+  // "IT'S TIME TO STOP!",
+  "Okay fine, keep playing... See if I care..." ]
+let scoreTextLength = scoreText.length;
 
 appendStats = () => {
   totalCorrectAnswers += correctAnswers;
@@ -677,10 +706,10 @@ titleAnimate = () => {
 }
 
 restartAnimate = () => {
-  jumbotron.animate( { backgroundColor: "#007bff" }, 2000, () => 
+  jumbotron.animate( { backgroundColor: jumboFadeColor }, 2000, () => 
     { jumbotron.animate( { backgroundColor: "#e9ecef" }, 2000 ) } 
   );
-  title.animate( { color: '#ffffff' }, 2000, () => 
+  title.animate( { color: titleFadeColor }, 2000, () => 
     { title.animate( { color: '#000' }, 2000 ) } 
   );
 };
