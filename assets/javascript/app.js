@@ -384,11 +384,17 @@ getChoices = ( qs ) => {
     clearInterval( questionIntervalId );
     clearTimeout( questionTimerId );
     clearInterval( smoothInterval );
-    if ( shuffledQuestions.length - 1 == questionIndex ) {
+    // If the at the end of the questions array for this round and gifs are enabled
+    if ( shuffledQuestions.length - 1 == questionIndex && gifOptionStatus ) {
+      showGif();
+      // If at the end of the questions array for this round and gifs are disabled
+    } else if ( shuffledQuestions.length - 1 == questionIndex && !gifOptionStatus ) {
       clearThings();
       endRound();
+      // If gifs are enabled
     } else if ( gifOptionStatus ) {
       showGif();
+      // if gifs are disabled
     } else {
       clearThings();
       displayQuestion( shuffledQuestions );
@@ -540,9 +546,6 @@ shuffle = ( array ) => {
 // Declare and set variables needed for the updateTimerBar function
 let barWidth = 100; // Bar starts at 100%
 let seconds = chosenDifficulty; // Same value, different name (so it makes more sense in context)
-// let fullPercent = ( barWidth / seconds ); // Get full number to subtract bar width by each interval
-// let smoothPercent = ( ( fullPercent / 100 ) * 17 ); // Get 17% of that number so we can run it 17 times to smooth it out
-// let subtractWidth = ( Math.floor( smoothPercent * 100 ) / 100 );  // Remove the unesecary decimal places so we have a clean number
 
 // Update a bootstrap timerbar so that it's width equals the percentage of time remaining every second
 updateTimerBar = () => {
@@ -567,14 +570,13 @@ updateTimerBar = () => {
 
 startTimerBarSmooth = () => { 
   smoothInterval = setInterval( smoothSubtract, 50 )
-  w = 100;
+  barWidth = 100;
 }
 
-let w = 100;
 smoothSubtract = () => {
   timerBar = $( '#timer-bar' );
-  w -= 0.25;
-  timerBar.css( 'width', `${w}%` )
+  barWidth -= 0.25;
+  timerBar.css( 'width', `${barWidth}%` )
 }
 
 // Tabs for categories on mouseover
@@ -649,9 +651,10 @@ endRound = () => {
 
 let scoreText = [
   "Let's see how you did...",
+  "Calculating your scores...",
   "Great moves! Keep it up!",
   "Wow, you've played a lot of rounds!",
-  "Okay, seriously there's not THAT much content in this game.",
+  "Okay, seriously, there's not that much content in this game.",
   "IT'S TIME TO STOP!",
   "Okay fine, keep playing... See if I care..." ]
 let scoreTextLength = scoreText.length;
@@ -743,6 +746,7 @@ jumbotronAnimate = () => {
 }
  
 titleAnimate = () => {
+  console.log("Welcome to Topnotch Trivia!")
   title.fadeIn( 1000 );
   jumbotron.animate( {
     backgroundColor: "#e9ecef",
