@@ -10,7 +10,7 @@ let
 // Html elements
 title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, gifTimerBar, questionText, chosenCategory, choice, timerBar,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, gifTime,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, gifTime, gifTimeDivId,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
@@ -202,13 +202,13 @@ generateInitialHtml = () => {
   $( 'body' ).append( 
     `<div class="container">
         <div class="jumbotron" id="jumbo">
-          <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia! <i class="fas fa-graduation-cap"></i></h1>
+          <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
           <hr class="my-4" id="divider">
           <h2 class="float-left" id="subtitle"></h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
           <div class="container" id="btn-container">
-            <button type="button" class="btn btn-primary btn-lg" id="btn-start"><i class="fas fa-caret-right"></i> Start</button>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-start">Start</button>
           </div>
         </div>
       </div>
@@ -346,7 +346,8 @@ displayQuestion = ( q ) => {
 getChoices = ( qs ) => {
   generateChoiceHtml( qs );
   choice.on( 'click', function() {
-    guess = $( this ).text().substring( 3 );
+    guess = $( this ).attr('data-value');
+    console.log("guess " + guess )
     if ( guess === qs[questionIndex].answer) {
       correctAnswer();
     } else {
@@ -378,8 +379,13 @@ generateChoiceHtml = ( q ) => {
   // Loop to create each choice element, every question has 4 choices so this will work on every question
   for ( let i = 0; i < 4; i++ ) {
     let listNum = i + 1
-    $( '.list-group' ).append(
-      `<button type="button" class="list-group-item list-group-item-action choice">${listNum}. ${choiceOrder[i]} <i class="choice-icon fas fa-arrow-right"></i></button>`
+    $( '.list-group' ).append(`
+      <button type="button" 
+      class="list-group-item list-group-item-action choice"
+      data-value="${choiceOrder[i]}">
+      ${listNum}. ${choiceOrder[i]}
+      <i class="choice-icon fas fa-arrow-right"></i>
+      </button>`
     );
   };
   choice = $( '.choice' )
@@ -424,6 +430,7 @@ timeUp = () => {
 
 showGif = () => {
   gifTime = 6;
+  gifTimeDivId = gifTime - 1;
   content.append( `<div id="gif"><iframe src="https://giphy.com/embed/${shuffledQuestions[questionIndex].gif}" width="480" height="480" frameBorder="0" class="giphy-embed"></iframe></div>` );
   gifDiv = $( '#gif' );
   clearTimeout( gifTimeoutId )
@@ -452,15 +459,17 @@ showGifTime = () => {
   gifTimerBar = $( '.gif-timer-bar' )
   gifInterval = setInterval( removeLastGifTimeDiv, 1000 )
 }
-let gifTimerId = 5;
-removeLastGifTimeDiv = () => {
-  console.log(gifTimerId)
-  gifTimerBar.last().remove();
-  gifTimerId--;
 
-  if (gifTimerId === 0) {
+
+removeLastGifTimeDiv = () => {
+  console.log("Gif time div id to remove: " + gifTimeDivId)
+  $( `#gif-timer-${gifTimeDivId}` ).remove();
+  gifTimeDivId--;
+  if (gifTimeDivId === -1) {
+    console.log("clearing gif remove interval")
     clearInterval(gifInterval);
   }
+  
 }
 
 // Randomize the order of input array so questions/choices appear in a different order on each game

@@ -55,6 +55,10 @@ body {
   width: 20%;
 }
 
+.fa-caret-right {
+  font-size: 2rem;
+}
+
 #btn-restart {
   width: 20%;
   bottom: 6rem;
@@ -165,14 +169,13 @@ body {
 
 /*-- Gifs --*/
 #gif {
-  align-items: center;
   margin-left: auto;
   margin-right: auto;
   width: 300px;
 }
 
 #gif-timer-container {
-  text-align: center;
+  /* text-align: center; */
 }
 
 .gif-timer-bar {
