@@ -453,7 +453,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, 10 );
+  }, gifTime * 1000 );
 };
 
 showGifTime = () => {
@@ -611,13 +611,13 @@ endRound = () => {
 };
 
 let scoreText = [
-  // "Let's see how you did...",
-  // "Calculating scores...", 
-  // "Great moves! Keep it up!",
-  // "Wow, you've played a lot of rounds!",
-  // "I'll grab the stats but you should think about taking a break.",
-  // "Okay, seriously there's not THAT much content in this game.",
-  // "IT'S TIME TO STOP!",
+  "Let's see how you did...",
+  "Calculating scores...", 
+  "Great moves! Keep it up!",
+  "Wow, you've played a lot of rounds!",
+  "I'll grab the stats but you should think about taking a break.",
+  "Okay, seriously there's not THAT much content in this game.",
+  "IT'S TIME TO STOP!",
   "Okay fine, keep playing... See if I care..." ]
 let scoreTextLength = scoreText.length;
 
@@ -671,10 +671,10 @@ $( 'body' ).append(`
           </button>
         </div>
         <div class="modal-body">
-        <p>This trivia game was created as a homework assignment for the GA Tech coding bootcamp in March 2019.</p>
+        <p>This trivia game was created as a homework assignment for a Georgia Tech coding bootcamp in March 2019.</p>
         <p>This game was created using entirely Javascript and jQuery!</p>
         <p>Check out the <a href="https://github.com/EthanBonsignori/Trivia-Game" target="_blank">github repository</a> for this project.</p>
-        <h6>-Ethan Bonsignori</h6>
+        <h6>-Ethan Bonsignori<span style="font-size: 0.1rem; float: right;">ps this game is known to get mad if you play too long</span></h6>
         </div>
       </div>
     </div>
