@@ -23,12 +23,24 @@ body {
   display: none;
 }
 
+#title-icon {
+  color: #007bff65;
+  font-size: 2rem;
+  position: absolute;
+  right: 0.4rem;
+  top: 0.4rem;
+}
+
 #divider {
   display: none;
 }
 
 #subtitle {
   display: none;
+}
+
+#category-icon-game {
+  display: inline-block;
 }
 
 #btn-container {
@@ -74,13 +86,18 @@ body {
   cursor: pointer;
 }
 
+.category-icon {
+  float: right;
+  margin-right: 1rem;
+}
+
 /* Style the tab content */
 .tabcontent {
   float: left;
   padding: 0px 12px;
   border: 1px solid #ccc;
   width: 70%;
-  height: 204px;
+  height: 228px;
   border-left: none;
   display: none;
 }
@@ -94,6 +111,12 @@ body {
 .choice:hover {
   color: white;
   background-color: #007bff;
+}
+
+.choice-icon {
+  float: right;
+  margin-top: 5px;
+  color: rgba(20, 20, 20, 0.5);
 }
 
 /*-- Timer Bar --*/
@@ -125,6 +148,19 @@ body {
 
 .red {
   background-color: #ff0000 !important;
+}
+
+/*-- Answer response Icons --*/
+.fa-check {
+  color: rgb(0, 211, 0);
+}
+
+.fa-times {
+  color: red;
+}
+
+.fa-hourglass-end {
+  color: rgb(167, 167, 23);
 }
 
 /*-- Gifs --*/

@@ -39,6 +39,7 @@ let categories = [
     value: 1,
     length: 5,
     difficulty: 'Easy',
+    icon: 'fa-paw', 
     description: 'The animal category contains questions dealing with everything in the animal kingdom!',
     questions: [
       { 
@@ -81,6 +82,7 @@ let categories = [
     value: 2,
     length: 6,
     difficulty: 'Medium',
+    icon: 'fa-atom',
     description: 'The science category contains questions that are sure to baffle the mind with a wide variety of science related questions ranging from biology to physics!',
     questions: [
       { 
@@ -129,6 +131,7 @@ let categories = [
     value: 3,
     length: 8,
     difficulty: 'Hard',
+    icon: 'fa-glass-martini-alt',
     description: 'A trivia category popularized by the long running TV show Jeopardy! and several appearances on the Saturday Night Live\'s skit Celebrity Jeopardy!' +
     ' This category features questions having to do with alcoholic beverages.',
     questions: [
@@ -199,13 +202,13 @@ generateInitialHtml = () => {
   $( 'body' ).append( 
     `<div class="container">
         <div class="jumbotron" id="jumbo">
-          <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
+          <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia! <i class="fas fa-graduation-cap"></i></h1>
           <hr class="my-4" id="divider">
           <h2 class="float-left" id="subtitle"></h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
           <div class="container" id="btn-container">
-            <button type="button" class="btn btn-primary btn-lg" id="btn-start">Start</button>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-start"><i class="fas fa-caret-right"></i> Start</button>
           </div>
         </div>
       </div>
@@ -240,6 +243,7 @@ generateCategoryHtml = () => {
     // Animate hide and replace of title text
     title.fadeOut( 500, () => {
       title.text( 'Topnotch Trivia' ).fadeIn( 3000 );
+      title.append(` <i class="fas fa-info-circle" id="title-icon"></i>`)
     } );
   }
   firstGame = false;
@@ -258,16 +262,17 @@ generateCategoryHtml = () => {
       `<button type="button" class="list-group-item btn-category tablinks" value="${ i.value }"   
       id="cat-btn-${i.value}"
       onmouseover="openCategory( event, '${ i.tabId }' )">
-      ${ i.name }</button></div>`
+      <h5>${ i.name }<i class="category-icon fas ${i.icon}"></i></h5>
+      </button>`
     )
     categoryButtonSelector = $( '.btn-category' )
     // Create tab content to show on hover
     jumbotron.append(
       `<div id="${ i.tabId }" class="tabcontent">
-      <h5><b>${ i.name }</b></h4>
-      <h6><b>Difficulty: </b>${ i.difficulty }</h5> 
-      <h6><b>Questions: </b>${ i.length }</h5> 
-      <h6>${ i.description }</h5>
+        <h4><b>${ i.name }</b></h4>
+        <h5><b>Difficulty: </b>${ i.difficulty }</h5> 
+        <h5><b>Questions: </b>${ i.length }</h5> 
+        <h5>${ i.description }</h5>
       </div>`
     )
   } );
@@ -278,7 +283,7 @@ generateCategoryHtml = () => {
     getCategory();
     // Switch subtitle to category name and display question counter
     subtitle.fadeOut( 0, () => {
-      subtitle.text( chosenCategory.name ).show();
+      subtitle.html( `<h4><i id="category-icon-game" class="fas ${chosenCategory.icon}"></i> ${chosenCategory.name}</h4>` ).show();
     } );
     content.append(`<div id="countdown">Get Ready!</div>`);
     countdownSelector = $( '#countdown' );
@@ -374,7 +379,7 @@ generateChoiceHtml = ( q ) => {
   for ( let i = 0; i < 4; i++ ) {
     let listNum = i + 1
     $( '.list-group' ).append(
-      `<button type="button" class="list-group-item list-group-item-action choice">${listNum}. ${choiceOrder[i]}</button>`
+      `<button type="button" class="list-group-item list-group-item-action choice">${listNum}. ${choiceOrder[i]} <i class="choice-icon fas fa-arrow-right"></i></button>`
     );
   };
   choice = $( '.choice' )
@@ -395,13 +400,13 @@ generateTimerBar = () => {
 correctAnswer = () => {
   correctAnswers++;
   console.log( `Correct Answer ----- This round: ${correctAnswers}` )
-  questionText.html( `Correct!` )
+  questionText.html( `<i class="fas fa-check"></i> Correct!` )
 }
 
 // Run on incorrect player guess
 incorrectAnswer = () => {
   incorrectAnswers++;
-  questionText.html( `Incorrect! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
+  questionText.html( `<i class="fas fa-times"></i> Incorrect! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Incorrect answer --- This round: ${incorrectAnswers}` )
 }
 
@@ -413,7 +418,7 @@ timeUp = () => {
   showGif();
   unanswered++;
   $( '.list-group' ).remove();
-  questionText.html( `You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
+  questionText.html( `<i class="fas fa-hourglass-end"></i> You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Ran out of time ---- This round: ${unanswered}` )
 }
 
