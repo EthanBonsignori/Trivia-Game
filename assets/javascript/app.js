@@ -283,7 +283,7 @@ generateCategoryHtml = () => {
     getCategory();
     // Switch subtitle to category name and display question counter
     subtitle.fadeOut( 0, () => {
-      subtitle.html( `<h4><i id="category-icon-game" class="fas ${chosenCategory.icon}"></i> ${chosenCategory.name}</h4>` ).show();
+      subtitle.html( `<h4><i id="category-icon-game" class="fas ${chosenCategory.icon}"></i> ${chosenCategory.name}</h4>` ).hide();
     } );
     content.append(`<div id="countdown">Get Ready!</div>`);
     countdownSelector = $( '#countdown' );
@@ -325,6 +325,7 @@ startGame = ( category ) => {
   questionCounter = 0;
   questionCounterHtml.text( `Question ${questionCounter + 1}` ).hide();
   questionCounterHtml.fadeIn( 300 );
+  subtitle.fadeIn( 300 )
   // Remove all select categories html
   removeCategories();
   // Randomize order of questions
@@ -424,7 +425,7 @@ timeUp = () => {
   showGif();
   unanswered++;
   $( '.list-group' ).remove();
-  questionText.html( `<i class="fas fa-hourglass-end"></i> You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
+  questionText.html( `<i class="far fa-clock"></i> You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Ran out of time ---- This round: ${unanswered}` )
 }
 
@@ -447,7 +448,7 @@ setGifTimeout = () => {
       questionTimer();
     }
     gifDiv.remove();
-  }, gifTime * 106600 );
+  }, gifTime * 1000 );
 };
 
 showGifTime = () => {

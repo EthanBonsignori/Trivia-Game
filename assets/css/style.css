@@ -152,15 +152,15 @@ body {
 
 /*-- Answer response Icons --*/
 .fa-check {
-  color: rgb(0, 211, 0);
+  color: rgb(0, 255, 0);
 }
 
 .fa-times {
-  color: red;
+  color: rgb(255, 0, 0);
 }
 
-.fa-hourglass-end {
-  color: rgb(167, 167, 23);
+.fa-clock {
+  color: rgb(255, 255, 0);
 }
 
 /*-- Gifs --*/
@@ -179,6 +179,7 @@ body {
   background-color: #007bff;
   border-radius: 3px;
   border: 1px solid black;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 iframe {
