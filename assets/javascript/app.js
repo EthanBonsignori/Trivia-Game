@@ -219,7 +219,6 @@ generateInitialHtml = () => {
 // Run first so we can select elements
 generateInitialHtml();
 
-
 // Select elements from created html
 jumbotron = $( '#jumbo' );
 title = $( '#title' );
@@ -240,10 +239,11 @@ $( document ).on( 'click', '#btn-start', () => {
 // Create the html that displays our category selection, hide it until jumbotron animation is complete
 generateCategoryHtml = () => {
   if ( firstGame ) {
+    appendModal();
     // Animate hide and replace of title text
     title.fadeOut( 500, () => {
       title.text( 'Topnotch Trivia' ).fadeIn( 3000 );
-      title.append(` <i class="fas fa-info-circle" id="title-icon"></i>`)
+      title.append(` <button type="button" id="title-icon" data-toggle="modal" data-target="#infoModal"><i class="fas fa-info-circle"></i></button>`)
     } );
   }
   firstGame = false;
@@ -285,7 +285,7 @@ generateCategoryHtml = () => {
     subtitle.fadeOut( 0, () => {
       subtitle.html( `<h4><i id="category-icon-game" class="fas ${chosenCategory.icon}"></i> ${chosenCategory.name}</h4>` ).hide();
     } );
-    content.append(`<div id="countdown">Get Ready!</div>`);
+    content.append(`<div id="countdown">Get Ready...</div>`);
     countdownSelector = $( '#countdown' );
     removeCategories();
     countdownIntervalId = setInterval( countdown, 1000 )
@@ -301,7 +301,7 @@ countdown = () => {
     countdownSelector.text( countdownSeconds )
   } else if ( countdownSeconds === 0 ) {
     countdownSelector.removeClass( 'countdownFont' )
-    countdownSelector.text( "Go!" )
+    countdownSelector.text( "GO!" )
   } else if ( countdownSeconds <= -1 ) {
     countdownSelector.remove();
     startGame( chosenCategory );
@@ -629,6 +629,29 @@ $( document ).on( 'click', '#btn-restart', () => {
     tab.show( )
   }, 2500 );
 } );
+
+appendModal = () => {
+$( 'body' ).append(`
+  <div class="modal fade" id="infoModal" tabindex="10" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="indoModalTitle">About</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <p>This trivia game was created as a homework assignment for the GA Tech coding bootcamp in March 2019.</p>
+        <p>This game was created using entirely Javascript and jQuery!</p>
+        <p>Check out the <a href="https://github.com/EthanBonsignori/Trivia-Game" target="_blank">github repository</a> for this project.</p>
+        <h6>-Ethan Bonsignori</h6>
+        </div>
+      </div>
+    </div>
+  </div>`
+  )
+}
 
 // Some fun animations
 jumbotronAnimate = () => {
