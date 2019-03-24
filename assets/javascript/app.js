@@ -1,9 +1,13 @@
-// Possible features: 
-// (DONE)Bar display on timer instead of number only, 
-// (DONE)Random order to questions and answers,
-// Select difficulty of game - how much time on each question
-// Sound effects and/or music
-// (DONE)Gifs relating to each question when answered 
+// Possible features:                                           // New features: 
+// (DONE)Bar display on timer instead of number only,           // Toggling gif display on/off
+// (DONE)Random order to questions and answers,                 // (??) Easter egg if you keep playing
+// Select difficulty of game - how much time on each question   // Info button that displays basic info
+// Sound effects and/or music                                 
+// (DONE)Gifs relating to each question when answered
+
+// TODO: 
+// Store gifs locally so they don't have annoying giphy border and load times
+// Display an indicator of incorrect or correct answer if gifs are disabled
 
 // Declaring variables
 let
@@ -384,24 +388,29 @@ getChoices = ( qs ) => {
     clearInterval( questionIntervalId );
     clearTimeout( questionTimerId );
     clearInterval( smoothInterval );
-    // If the at the end of the questions array for this round and gifs are enabled
-    if ( shuffledQuestions.length - 1 == questionIndex && gifOptionStatus ) {
-      showGif();
-      // If at the end of the questions array for this round and gifs are disabled
-    } else if ( shuffledQuestions.length - 1 == questionIndex && !gifOptionStatus ) {
-      clearThings();
-      endRound();
-      // If gifs are enabled
-    } else if ( gifOptionStatus ) {
-      showGif();
-      // if gifs are disabled
-    } else {
-      clearThings();
-      displayQuestion( shuffledQuestions );
-      questionTimer();
-    }
+    // Check game state and if gifs are enabled or disabled
+    checkGifStatus();
   } );
 };
+
+checkGifStatus = () => {
+  // If the at the end of the questions array for this round and gifs are enabled
+  if ( shuffledQuestions.length - 1 == questionIndex && gifOptionStatus ) {
+    showGif();
+    // If at the end of the questions array for this round and gifs are disabled
+  } else if ( shuffledQuestions.length - 1 == questionIndex && !gifOptionStatus ) {
+    clearThings();
+    endRound();
+    // If gifs are enabled
+  } else if ( gifOptionStatus ) {
+    showGif();
+    // if gifs are disabled
+  } else {
+    clearThings();
+    displayQuestion( shuffledQuestions );
+    questionTimer();
+  }
+}
 
 clearThings = () => {
   clearTimeout( gifTimeoutId )
@@ -768,4 +777,5 @@ restartAnimate = () => {
   );
 };
 
+// Call first
 titleAnimate();
