@@ -205,6 +205,10 @@ body {
   color: rgb(225, 100, 0);
 }
 
+.result-icon {
+  font-size: 10rem;
+}
+
 /*-- Gifs --*/
 #gif {
   margin-left: auto;

@@ -14,7 +14,7 @@ let
 // Html elements
 title, divider, subtitle, content, startButton, restartButton, tab, categoryButtonSelector, gifDiv, gifTimerContainer, gifTimerBar, questionText, chosenCategory, choice, timerBar, optionCog,
 // Data
-shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, playerIsInsane, gifTime, gifOption, gifOptionStatus, gifTimeDivId, scoreTextIndex, jumboFadeColor, titleFadeColor,
+shuffledQuestions, questionIndex, questionCounter, questionTime, guess, firstGame, countdownSeconds, totalRounds, playerIsInsane, answerResult, gifTime, gifOption, gifOptionStatus, gifTimeDivId, scoreTextIndex, jumboFadeColor, titleFadeColor,
 // Answers
 correctAnswers, incorrectAnswers, unanswered, totalCorrectAnswers, totalIncorrectAnswers, totalUnanswered,
 // Intervals & Timeouts
@@ -41,6 +41,12 @@ difficultyEasy = 30;
 difficultyMedium = 20; 
 difficultyHard = 10;
 chosenDifficulty = difficultyMedium;
+
+// Icon display for when gifs are disabled
+let resultCheck = $( `<i class="result-icon fas fa-check"></i>` );
+let resultX =     $( `<i class="result-icon fas fa-times"></i>` );
+let resultClock = $( `<i class="result-icon far fa-clock"></i>` );
+
 
 let categories = [
 
@@ -381,6 +387,7 @@ getChoices = ( qs ) => {
   generateChoiceHtml( qs );
   choice.on( 'click', function() {
     guess = $( this ).attr('data-value');
+    // Check if guess is the correct answer
     if ( guess === qs[questionIndex].answer) {
       correctAnswer();
     } else {
@@ -396,7 +403,11 @@ getChoices = ( qs ) => {
 
 // Check game state and if gifs are enabled or disabled
 checkGifStatus = () => {
-  // If the at the end of the questions array for this round and gifs are enabled
+  // If gifs are disabled show if the answer was correct/incorrect or timeout
+  if ( !gifOptionStatus ) { 
+    displayAnswerResult();
+  }
+  // If at the end of the questions array for this round and gifs are enabled
   if ( shuffledQuestions.length - 1 == questionIndex && gifOptionStatus ) {
     showGif();
     // If at the end of the questions array for this round and gifs are disabled
@@ -420,6 +431,11 @@ clearThings = () => {
   clearInterval( questionIntervalId );
   clearTimeout( questionTimerId );
   clearInterval( smoothInterval );
+}
+
+// Call when gifs are disabled - show visual check or x if answer was correct or incorrect respectively
+displayAnswerResult = () => {
+  content.append(answerResult);
 }
 
 // Start the timer for each new question and update the timer bar
@@ -499,6 +515,7 @@ generateTimerBar = () => {
 // Called on correct player guess
 correctAnswer = () => {
   correctAnswers++;
+  answerResult = resultCheck;
   console.log( `Correct Answer ----- This round: ${correctAnswers}` )
   questionText.html( `<i class="fas fa-check"></i> Correct!` )
 }
@@ -506,6 +523,7 @@ correctAnswer = () => {
 // Called on incorrect player guess
 incorrectAnswer = () => {
   incorrectAnswers++;
+  answerResult = resultX;
   questionText.html( `<i class="fas fa-times"></i> Incorrect! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Incorrect answer --- This round: ${incorrectAnswers}` )
 }
@@ -517,6 +535,7 @@ timeUp = () => {
   clearInterval( smoothInterval );
   showGif();
   unanswered++;
+  answerResult = resultClock;
   $( '.list-group' ).remove();
   questionText.html( `<i class="far fa-clock"></i> You ran out of time! The correct answer was: <b>${shuffledQuestions[questionIndex].answer}</b>` )
   console.log( `Ran out of time ---- This round: ${unanswered}` )
@@ -667,13 +686,13 @@ endRound = () => {
 };
 
 let scoreText = [
-  "Let's see how you did...",
-  "Round 2 scores coming right up!",
-  "Great moves! Keep it up!",
-  "Wow, you've played a lot of rounds!",
-  "Honestly this is too many rounds to keep track of.",
-  "Seriously there's not that much content in this game.",
-  "IT'S TIME TO STOP!",
+  // "Let's see how you did...",
+  // "Round 2 scores coming right up!",
+  // "Great moves! Keep it up!",
+  // "Wow, you've played a lot of rounds!",
+  // "Honestly this is too many rounds to keep track of.",
+  // "Seriously there's not that much content in this game.",
+  // "IT'S TIME TO STOP!",
   "Okay fine, keep playing... See if I care..." ]
 let scoreTextLength = scoreText.length;
 
