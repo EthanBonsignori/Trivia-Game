@@ -30,8 +30,8 @@ body {
   color: rgba(0, 123, 255, 0.5);
   font-size: 2rem;
   position: absolute;
-  right: 0.4rem;
-  top: 0.4rem;
+  right: 0.3rem;
+  top: 0;
   -webkit-appearance: none;
   background: none;
   border: none;
@@ -89,7 +89,12 @@ body {
 
 #btn-start {
   display: none;
-  width: 15%;
+  width: 15%; 
+}
+
+#btn-start:hover {
+  background-color: #004b9b;
+  border-color: #004b9b;
 }
 
 #btn-restart {

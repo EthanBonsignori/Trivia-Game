@@ -7,7 +7,7 @@
 
 // TODO:
 // Store gifs locally so they don't have annoying giphy border and load times
-// Display an indicator of incorrect or correct answer if gifs are disabled
+// (DONE)Display an indicator of incorrect or correct answer if gifs are disabled
 
 // Declaring variables
 let
@@ -144,7 +144,7 @@ let categories = [
     length: 8,
     difficulty: 'Hard',
     icon: 'fa-glass-martini-alt',
-    description: 'A trivia category popularized by the long running TV show Jeopardy! and several appearances on the Saturday Night Live\'s skit Celebrity Jeopardy!' +
+    description: 'A trivia category popularized by the long running TV show Jeopardy! and several appearances on the recurring Saturday Night Live skit Celebrity Jeopardy!' +
       ' This category features questions having to do with alcoholic beverages.',
     questions: [
       {
@@ -197,7 +197,6 @@ let categories = [
       }
     ]
   }
-
 ]
 
 let resetVars = () => {
@@ -213,13 +212,13 @@ let generateInitialHtml = () => {
   $('body').append(
     `<div class="container">
         <div class="jumbotron" id="jumbo">
-          <h1 class="display-3 text-center" id="title">Welcome to Topnotch Trivia!</h1>
+          <h1 class="display-3 text-center animated slideInUp slower" id="title">Welcome to Topnotch Trivia!</h1>
           <hr class="my-4" id="divider">
           <h2 class="float-left" id="subtitle"></h2><h2 class="float-right" id="question-counter"></h2>
           <div class="clearfix"></div>
           <div id="main-content">
           <div class="container" id="btn-container">
-            <button type="button" class="btn btn-primary btn-lg" id="btn-start">Start</button>
+            <button type="button" class="btn btn-primary btn-lg animated infinite pulse slow" id="btn-start">Start</button>
           </div>
         </div>
       </div>
@@ -254,15 +253,16 @@ let generateCategoryHtml = () => {
     // Animate hide and replace of title text
     title.fadeOut(500, () => {
       title.text('Topnotch Trivia').fadeIn(3000)
-      title.append(`
-        <button type="button" id="title-icon" 
+      jumbotron.append(`
+        <button type="button" class="animated rotateIn slow" 
+        id="title-icon" 
         data-toggle="modal" data-target="#infoModal">
           <i class="fas fa-info-circle"
           data-toggle="tooltip" data-placement="top" title="Info"></i>
         </button>`)
       jumbotron.append(`
-        <button type="button" id="option-cog"
-        Toggle Gifs: 
+        <button type="button" class="animated rotateIn slow" 
+        id="option-cog"
         data-toggle="tooltip" data-placement="top" title="Toggle gif display">
           <i id="option-cog-icon" class="fas fa-video"></i>
         </button>`)
@@ -276,7 +276,7 @@ let generateCategoryHtml = () => {
     subtitle.text('Select a Category').hide()
   })
   // Add a tab for our category buttons
-  jumbotron.append('<div class="tab"></div>')
+  jumbotron.append('<div class="tab animated flipInX"></div>')
   tab = $('.tab').hide()
 
   // Loop for each category, adding a button for each then corresponding tab content"
@@ -309,7 +309,7 @@ let generateCategoryHtml = () => {
     subtitle.fadeOut(0, () => {
       subtitle.html(`<h4><i id="category-icon-game" class="fas ${chosenCategory.icon}"></i> ${chosenCategory.name}</h4>`).hide()
     })
-    content.append(`<div id="countdown">Get Ready...</div>`)
+    content.append(`<div class= "animated zoomIn" id="countdown">Get Ready...</div>`)
     countdownSelector = $('#countdown')
     removeCategories()
     countdownIntervalId = setInterval(countdown, 1000)
@@ -473,7 +473,6 @@ let updateTimerBarText = () => {
   };
 }
 
-// Declare and set variables needed for the updateTimerBar function
 let barWidth = 100 // Bar starts at 100%
 // Interval every 50ms to smoothly move the width of the bar down instead of chunks every 1s
 let updateTimerBarWidth = () => {
@@ -794,9 +793,10 @@ let titleAnimate = () => {
   }, 3000)
   title.animate({
     color: '#000'
-  }, 3000, () => {
-    startButton.fadeIn(500)
-  })
+  }, 3000)
+  setTimeout(() => {
+    startButton.fadeIn(2000)
+  }, 1500)
 }
 
 let restartAnimate = () => {
